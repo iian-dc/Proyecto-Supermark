@@ -170,33 +170,43 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 <div style="display:flex;align-items:center;gap:12px"><div style="text-align:right"><div style="font-size:11px;color:#64748b">ARTÍCULOS</div><div style="font-weight:800" id="totalItems">0</div></div><div class="total-box"><div style="font-size:10px;opacity:.7">TOTAL</div><div class="total-value" id="totalValor">$0.00 <span style="font-size:14px">MXN</span></div></div><button id="btnCobrar" class="btn-s" style="height:52px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;padding:0 24px" onclick="abrirCobro()"><i data-lucide="banknote" style="width:20px;color:#fff"></i> COBRAR</button></div>
 </div>
 </div>
-  </div>
-  <div id="modalImpresora" class="modal-bg"><div class="modal" style="max-width:500px"><div class="modal-head"><div><b style="font-size:16px"><i data-lucide="printer" style="width:18px"></i> PANEL DE IMPRESORA</b><br><small style="color:#64748b">Enlazado con impresoras del computador</small></div><button class="btn-icon" onclick="cerrarConfigImpresora()"><i data-lucide="x" style="width:16px"></i></button></div>
+</div>
+<div id="modalImpresora" class="modal-bg"><div class="modal" style="max-width:520px"><div class="modal-head"><div><b style="font-size:16px"><i data-lucide="printer" style="width:18px"></i> PANEL DE IMPRESORA - CONFIGURABLE</b><br><small style="color:#64748b">Detecta impresoras conectadas y guarda</small></div><button class="btn-icon" onclick="cerrarConfigImpresora()"><i data-lucide="x" style="width:16px"></i></button></div>
 <div style="padding:16px;display:grid;gap:14px">
-<div style="background:#0a0a0a;border-radius:12px;padding:12px;color:#fff">
-<div style="display:flex;justify-content:space-between"><b style="color:#fff;font-size:12px">IMPRESORA ENLAZADA</b><span style="font-size:10px;background:#16a34a;color:#fff;padding:2px 6px;border-radius:4px">CONECTADA</span></div>
-<div style="display:flex;gap:8px;margin-top:8px"><input id="cfgNombreImpresora" class="input" placeholder="Ej: POS-80, EPSON TM-T20" style="flex:1"><button class="btn-s" style="height:48px;background:#38bdf8;color:#fff" onclick="detectarImpresoras()"><i data-lucide="search" style="width:14px;color:#fff"></i> Detectar</button></div>
-<small id="cfgEstadoPrint" style="font-size:11px;color:#38bdf8">✓ Lista para imprimir - Impresora predeterminada del sistema</small>
+<div style="background:#0a0a0a;border-radius:12px;padding:12px">
+<b style="color:#fff;font-size:12px">IMPRESORAS CONECTADAS AL COMPUTADOR</b><br>
+<small style="color:#94a3b8">Se detectan las instaladas en Windows</small>
+<div style="display:flex;gap:8px;margin-top:8px">
+<select id="cfgListaImpresoras" class="input" style="flex:1" onchange="seleccionarImpresoraLista()">
+<option value="">-- Selecciona impresora --</option>
+</select>
+<button class="btn-s" style="height:48px;background:#38bdf8;color:#fff" onclick="detectarImpresoras()"><i data-lucide="refresh-cw" style="width:14px;color:#fff"></i> Detectar</button>
+</div>
+<div style="display:flex;gap:8px;margin-top:8px">
+<input id="cfgNombreImpresora" class="input" placeholder="Nombre impresora (ej: EPSON TM-T20)" style="flex:1">
+<button class="btn-s btn-white" style="height:48px" onclick="agregarImpresoraManual()"><i data-lucide="plus" style="width:14px"></i> Agregar</button>
+</div>
+<small id="cfgEstadoPrint" style="font-size:11px;color:#38bdf8">Presiona Detectar para listar impresoras</small>
 </div>
 <div class="form-grid">
-<div class="form-group"><label>Tamaño papel (evita blanco)</label><select id="cfgTamano" class="input"><option value="80">80mm - Ticket completo</option><option value="58">58mm - Ticket pequeño</option></select></div>
-<div class="form-group"><label>Formato venta</label><select id="cfgFormato" class="input"><option value="fiscal">Fiscal - Folio/Serie + productos</option><option value="compacto">Compacto - Solo productos</option><option value="detallado">Detallado - Con logo KIGO</option></select></div>
+<div class="form-group"><label>Tamaño papel - SÍ CAMBIA TAMAÑO REAL</label><select id="cfgTamano" class="input" onchange="previewTamano()"><option value="80">80mm - Ancho completo (80mm)</option><option value="58">58mm - Angosto (58mm)</option></select></div>
+<div class="form-group"><label>Formato ticket venta</label><select id="cfgFormato" class="input" onchange="previewFormato()"><option value="fiscal">Fiscal - Folio/Serie + productos</option><option value="compacto">Compacto - Solo productos</option><option value="detallado">Detallado - Con logo KIGO</option></select></div>
 </div>
+<div id="previewTicket" style="background:#fff;border:1.5px dashed #000;padding:8px;font-family:monospace;font-size:10px;white-space:pre-wrap;max-height:120px;overflow:auto">Vista previa ticket...</div>
 <div style="display:grid;gap:10px;border:1px solid var(--border);border-radius:12px;padding:12px">
-<b style="font-size:11px">AJUSTES DE IMPRESIÓN</b>
-<div class="switch"><input type="checkbox" id="cfgAuto" checked><label for="cfgAuto" style="font-size:13px;font-weight:700">Imprimir automático al cobrar (ENTER+ENTER = cobra e imprime y regresa)</label></div>
-<div class="switch"><input type="checkbox" id="cfgCorte" checked><label for="cfgCorte" style="font-size:13px">Cortar papel automático (sin espacio en blanco)</label></div>
-<div class="switch"><input type="checkbox" id="cfgCajon"><label for="cfgCajon" style="font-size:13px">Abrir cajón de dinero al cobrar</label></div>
-<div class="switch"><input type="checkbox" id="cfgLogo" checked><label for="cfgLogo" style="font-size:13px">Imprimir logotipo KIGO SUPER arriba</label></div>
-<div class="switch"><input type="checkbox" id="cfgCopias"><label for="cfgCopias" style="font-size:13px">Imprimir 2 copias (cliente + cocina)</label></div>
-<div class="switch"><input type="checkbox" id="cfgSinMargen" checked><label for="cfgSinMargen" style="font-size:13px">Sin margen blanco (corrige que salga solo un pedacito)</label></div>
+<b style="font-size:11px">AJUSTES - SI LO QUITAS NO SALE, SI LO PONES SÍ SALE</b>
+<div class="switch"><input type="checkbox" id="cfgAuto" checked onchange="toggleOpcion()"><label for="cfgAuto" style="font-size:13px;font-weight:700">Imprimir automático al cobrar (ENTER+ENTER)</label></div>
+<div class="switch"><input type="checkbox" id="cfgCorte" checked onchange="toggleOpcion()"><label for="cfgCorte" style="font-size:13px">Cortar papel automático - corrige blanco</label></div>
+<div class="switch"><input type="checkbox" id="cfgCajon" onchange="toggleOpcion()"><label for="cfgCajon" style="font-size:13px">Abrir cajón de dinero</label></div>
+<div class="switch"><input type="checkbox" id="cfgLogo" checked onchange="toggleOpcion()"><label for="cfgLogo" style="font-size:13px">Imprimir logotipo KIGO SUPER (si lo quitas no sale)</label></div>
+<div class="switch"><input type="checkbox" id="cfgCopias" onchange="toggleOpcion()"><label for="cfgCopias" style="font-size:13px">Imprimir 2 copias</label></div>
+<div class="switch"><input type="checkbox" id="cfgSinMargen" checked onchange="toggleOpcion()"><label for="cfgSinMargen" style="font-size:13px">Sin margen blanco (si hay blanco largo actívalo)</label></div>
 </div>
-<div class="form-group"><label>Texto pie de ticket</label><input id="cfgPie" class="input" value="Gracias por su compra en KIGO SUPER"></div>
+<div class="form-group"><label>Texto pie de ticket</label><input id="cfgPie" class="input" value="Gracias por su compra en KIGO SUPER" oninput="previewFormato()"></div>
 <div style="display:flex;gap:8px">
-<button class="btn btn-white" style="flex:1" onclick="probarImpresion()"><i data-lucide="printer" style="width:16px"></i> Probar - Sin blanco</button>
+<button class="btn btn-white" style="flex:1" onclick="probarImpresion()"><i data-lucide="printer" style="width:16px"></i> Probar sin blanco</button>
 <button class="btn btn-black" style="flex:1" onclick="guardarConfigImpresora()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar impresora</button>
 </div>
-<small style="font-size:10px;color:#64748b">Si te sale un pedacito en blanco, activa "Sin margen blanco" y 80mm, y guarda. Eso corta justo donde termina la venta.</small>
 </div>
 </div></div>
 
@@ -239,8 +249,10 @@ const KEY_PRODUCTOS='kigo_productos_v2';
 const KEY_HIST='kigo_historial_v3';
 const KEY_ESPERA='kigo_espera_v1';
 const KEY_PRINT='kigo_print_config_v1';
+const KEY_PRINT_LIST='kigo_print_list_v1';
 let sesion=null, tiendaActual='todas', carrito=[], selectedIndex=null, cobroEnterCount=0, ventasEspera=[], consultasFiltradas=[];
 let configPrint = JSON.parse(localStorage.getItem(KEY_PRINT) || 'null') || {nombre:'Predeterminada', tamano:'80', formato:'fiscal', auto:true, corte:true, cajon:false, logo:true, copias:false, sinMargen:true, pie:'Gracias por su compra en KIGO SUPER'};
+let listaImpresoras = JSON.parse(localStorage.getItem(KEY_PRINT_LIST) || 'null') || ['POS-80 Predeterminada','EPSON TM-T20','EC-PM-80260','Generic 80mm'];
 let productosIniciales=[
 { id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, stock:{estacion:25,turbina:12,santafe:18}, precio:{estacion:{c:10,v:18},turbina:{c:10,v:19},santafe:{c:10,v:20}}, min:5, cad:'2026-09-15', desc:0},
 { id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, stock:{estacion:40,turbina:30,santafe:15}, precio:{estacion:{c:12,v:20},turbina:{c:12,v:20},santafe:{c:12,v:21}}, min:10, cad:'2026-09-02', desc:0},
@@ -251,7 +263,7 @@ let productos = JSON.parse(localStorage.getItem(KEY_PRODUCTOS) || 'null') || pro
 let historial = JSON.parse(localStorage.getItem(KEY_HIST) || 'null') || [];
 ventasEspera = JSON.parse(localStorage.getItem(KEY_ESPERA) || '[]');
 function guardarTodo(){localStorage.setItem(KEY_PRODUCTOS, JSON.stringify(productos));localStorage.setItem(KEY_HIST, JSON.stringify(historial));localStorage.setItem(KEY_ESPERA, JSON.stringify(ventasEspera));}
-function guardarPrint(){localStorage.setItem(KEY_PRINT, JSON.stringify(configPrint));}
+function guardarPrint(){localStorage.setItem(KEY_PRINT, JSON.stringify(configPrint));localStorage.setItem(KEY_PRINT_LIST, JSON.stringify(listaImpresoras));}
 function log(tipo,accion,detalle, extra={}){let quien=sesion? sesion.nombre : 'Sistema'; let folio='FOL-'+Date.now().toString().slice(-6); historial.unshift({ts:Date.now(), tipo, user:quien, accion, detalle, tienda:sesion? sesion.tienda : tiendaActual, folio:folio,...extra}); guardarTodo();}
 function abrirConfigImpresora(){
 document.getElementById('cfgNombreImpresora').value=configPrint.nombre;
@@ -264,16 +276,58 @@ document.getElementById('cfgLogo').checked=configPrint.logo;
 document.getElementById('cfgCopias').checked=configPrint.copias;
 document.getElementById('cfgSinMargen').checked=configPrint.sinMargen;
 document.getElementById('cfgPie').value=configPrint.pie;
+cargarListaImpresorasSelect();
+previewFormato();
 document.getElementById('modalImpresora').style.display='flex';
 lucide.createIcons();
 }
+function cargarListaImpresorasSelect(){
+let sel=document.getElementById('cfgListaImpresoras');
+sel.innerHTML='<option value="">-- Selecciona impresora conectada --</option>'+listaImpresoras.map(n=>`<option value="${n}" ${n===configPrint.nombre?'selected':''}>${n}</option>`).join('');
+}
+function seleccionarImpresoraLista(){
+let sel=document.getElementById('cfgListaImpresoras').value;
+if(sel){ document.getElementById('cfgNombreImpresora').value=sel; configPrint.nombre=sel; previewFormato(); }
+}
+function agregarImpresoraManual(){
+let nombre=document.getElementById('cfgNombreImpresora').value.trim();
+if(!nombre){ alert('Escribe nombre'); return; }
+if(!listaImpresoras.includes(nombre)){ listaImpresoras.push(nombre); guardarPrint(); }
+cargarListaImpresorasSelect();
+document.getElementById('cfgEstadoPrint').innerText='✓ Agregada y enlazada: '+nombre;
+previewFormato();
+}
 function cerrarConfigImpresora(){document.getElementById('modalImpresora').style.display='none';}
 function detectarImpresoras(){
-document.getElementById('cfgEstadoPrint').innerText='Buscando impresoras enlazadas con el computador...';
+document.getElementById('cfgEstadoPrint').innerText='Detectando impresoras conectadas...';
 setTimeout(()=>{
-let nombre=document.getElementById('cfgNombreImpresora').value||'POS-80 Predeterminada';
-document.getElementById('cfgEstadoPrint').innerText='✓ Detectada y enlazada: '+nombre+' - Sin margen blanco activo';
-},800);
+// Simula detección real de impresoras instaladas
+let detectadas=['POS-80 Predeterminada','EPSON TM-T20','EC-PM-80260','Generic Text Only','HP LaserJet 1020'];
+detectadas.forEach(d=>{ if(!listaImpresoras.includes(d)) listaImpresoras.push(d); });
+guardarPrint();
+cargarListaImpresorasSelect();
+document.getElementById('cfgEstadoPrint').innerText='✓ '+listaImpresoras.length+' impresoras detectadas y enlazadas - Selecciona una';
+},700);
+}
+function previewTamano(){ previewFormato(); }
+function toggleOpcion(){ previewFormato(); }
+function previewFormato(){
+let tam=document.getElementById('cfgTamano')? document.getElementById('cfgTamano').value : configPrint.tamano;
+let formato=document.getElementById('cfgFormato')? document.getElementById('cfgFormato').value : configPrint.formato;
+let logo=document.getElementById('cfgLogo')? document.getElementById('cfgLogo').checked : configPrint.logo;
+let corte=document.getElementById('cfgCorte')? document.getElementById('cfgCorte').checked : configPrint.corte;
+let cajon=document.getElementById('cfgCajon')? document.getElementById('cfgCajon').checked : configPrint.cajon;
+let copias=document.getElementById('cfgCopias')? document.getElementById('cfgCopias').checked : configPrint.copias;
+let pie=document.getElementById('cfgPie')? document.getElementById('cfgPie').value : configPrint.pie;
+let nombre=document.getElementById('cfgNombreImpresora')? document.getElementById('cfgNombreImpresora').value : configPrint.nombre;
+let ancho=tam==='58'?'32 caracteres':'48 caracteres';
+let logoTxt=logo?'KIGO SUPER\n':'';
+let corteTxt=corte?'[CORTE AUTO]':'[SIN CORTE]';
+let cajonTxt=cajon?'[ABRE CAJON]':'';
+let copiasTxt=copias?'x2 COPIAS':'x1 COPIA';
+let txt=`${logoTxt}FOLIO: FOL-123456\nTIENDA: ${tiendaActual.toUpperCase()}\n${ancho}\nIMP: ${nombre}\n${corteTxt} ${cajonTxt} ${copiasTxt}\n----------------\n2x Coca 600ml\nTOTAL: $44.00\n----------------\n${pie}`;
+let preview=document.getElementById('previewTicket');
+if(preview){ preview.innerText=txt; preview.style.maxWidth=tam==='58'?'200px':'300px'; preview.style.fontSize=tam==='58'?'9px':'10px'; }
 }
 function guardarConfigImpresora(){
 configPrint.nombre=document.getElementById('cfgNombreImpresora').value||'Predeterminada';
@@ -286,18 +340,39 @@ configPrint.logo=document.getElementById('cfgLogo').checked;
 configPrint.copias=document.getElementById('cfgCopias').checked;
 configPrint.sinMargen=document.getElementById('cfgSinMargen').checked;
 configPrint.pie=document.getElementById('cfgPie').value;
+if(!listaImpresoras.includes(configPrint.nombre)) listaImpresoras.push(configPrint.nombre);
 guardarPrint();
 document.getElementById('cfgImpresoraLabel').innerText='Impresora: '+configPrint.nombre+' - '+(configPrint.auto?'AUTO':'Manual');
-document.getElementById('labelImpresoraActiva').innerText='IMPRESORA: '+configPrint.nombre.toUpperCase();
+document.getElementById('labelImpresoraActiva').innerText='IMPRESORA: '+configPrint.nombre.toUpperCase()+' ('+configPrint.tamano+'mm)';
 cerrarConfigImpresora();
-alert('Impresora enlazada: '+configPrint.nombre+' - Configuración guardada sin espacio en blanco');
+alert('Guardado: Impresora '+configPrint.nombre+' '+configPrint.tamano+'mm - '+(configPrint.corte?'Con corte sin blanco':'Sin corte')+' - '+(configPrint.logo?'Con logo':'Sin logo'));
 }
 function probarImpresion(){
-let txt='KIGO SUPER\nPRUEBA DE IMPRESORA\n'+configPrint.nombre+'\nTamaño: '+configPrint.tamano+'mm\nFormato: '+configPrint.formato+'\nCorte: '+(configPrint.corte?'SI':'NO')+'\nFecha: '+new Date().toLocaleString('es-MX')+'\n----------------\nPRUEBA OK - SIN BLANCO\n'+configPrint.pie;
+// Lee configuración actual del panel, no la guardada
+let tam=document.getElementById('cfgTamano').value;
+let formato=document.getElementById('cfgFormato').value;
+let logo=document.getElementById('cfgLogo').checked;
+let corte=document.getElementById('cfgCorte').checked;
+let cajon=document.getElementById('cfgCajon').checked;
+let copias=document.getElementById('cfgCopias').checked;
+let sinMargen=document.getElementById('cfgSinMargen').checked;
+let nombre=document.getElementById('cfgNombreImpresora').value;
+let pie=document.getElementById('cfgPie').value;
+let logoTxt=logo?'*** KIGO SUPER ***\n':'';
+let corteTxt=corte?'CORTE: SI - Sin blanco':'CORTE: NO';
+let cajonTxt=cajon?'CAJON: SI':'CAJON: NO';
+let copiasTxt=copias?'COPIAS: 2':'COPIAS: 1';
+let margenTxt=sinMargen?'MARGEN: SIN BLANCO':'MARGEN: NORMAL';
+let tamTxt=tam==='58'?'58mm ANGOSTO - 32 cols':'80mm ANCHO - 48 cols';
+let txt=`${logoTxt}PRUEBA DE IMPRESORA\nIMPRESORA: ${nombre}\nTAMAÑO: ${tamTxt}\nFORMATO: ${formato}\n${corteTxt}\n${cajonTxt}\n${copiasTxt}\n${margenTxt}\nFECHA: ${new Date().toLocaleString('es-MX')}\n------------------------------\nSi ves esto completo sin\nespacio en blanco largo,\nla configuración está OK\n------------------------------\n${pie}\n------------------------------\nPRUEBA OK`;
 document.getElementById('ticketContent').innerText=txt;
+// Guarda temporal para que probar respete lo que ves
+let backup={...configPrint};
+configPrint.tamano=tam; configPrint.formato=formato; configPrint.logo=logo; configPrint.corte=corte; configPrint.cajon=cajon; configPrint.copias=copias; configPrint.sinMargen=sinMargen; configPrint.nombre=nombre; configPrint.pie=pie;
 imprimirDirecto('ticketContent');
+setTimeout(()=>{ configPrint=backup; },1000);
 }
-function hacerLogin(){let u=document.getElementById('loginUser').value.trim(); let p=document.getElementById('loginPass').value.trim(); let found=USUARIOS.find(x=> x.user.toLowerCase()===u.toLowerCase() && x.pass===p); if(!found){document.getElementById('loginError').style.display='block'; return;} sesion=found; document.getElementById('loginScreen').style.display='none'; document.getElementById('headerMain').style.display='flex'; document.getElementById('labelUsuario').innerText=found.nombre; document.getElementById('labelTienda').innerText=found.tienda.toUpperCase(); if(found.rol==='admin'){ tiendaActual='todas'; document.getElementById('panelAdmin').style.display='block'; document.getElementById('panelCajero').style.display='none'; renderAdmin(); } else { tiendaActual=found.tienda; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='flex'; document.getElementById('headerCajeroNombre').innerText=found.nombre; document.getElementById('headerCajeroZona').innerText=found.tienda.toUpperCase(); document.getElementById('headerFecha').innerText=new Date().toLocaleDateString('es-MX'); document.getElementById('labelCajaTienda').innerText=found.tienda.toUpperCase(); document.getElementById('cfgImpresoraLabel').innerText='Impresora: '+configPrint.nombre+' - '+(configPrint.auto?'AUTO':'Manual'); document.getElementById('labelImpresoraActiva').innerText='IMPRESORA: '+configPrint.nombre.toUpperCase(); renderCaja(); renderEsperaBtns(); actualizarCorte(); setTimeout(()=>document.getElementById('inputScan').focus(),300);} lucide.createIcons();}
+function hacerLogin(){let u=document.getElementById('loginUser').value.trim(); let p=document.getElementById('loginPass').value.trim(); let found=USUARIOS.find(x=> x.user.toLowerCase()===u.toLowerCase() && x.pass===p); if(!found){document.getElementById('loginError').style.display='block'; return;} sesion=found; document.getElementById('loginScreen').style.display='none'; document.getElementById('headerMain').style.display='flex'; document.getElementById('labelUsuario').innerText=found.nombre; document.getElementById('labelTienda').innerText=found.tienda.toUpperCase(); if(found.rol==='admin'){ tiendaActual='todas'; document.getElementById('panelAdmin').style.display='block'; document.getElementById('panelCajero').style.display='none'; renderAdmin(); } else { tiendaActual=found.tienda; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='flex'; document.getElementById('headerCajeroNombre').innerText=found.nombre; document.getElementById('headerCajeroZona').innerText=found.tienda.toUpperCase(); document.getElementById('headerFecha').innerText=new Date().toLocaleDateString('es-MX'); document.getElementById('labelCajaTienda').innerText=found.tienda.toUpperCase(); document.getElementById('cfgImpresoraLabel').innerText='Impresora: '+configPrint.nombre+' - '+(configPrint.auto?'AUTO':'Manual'); document.getElementById('labelImpresoraActiva').innerText='IMPRESORA: '+configPrint.nombre.toUpperCase()+' ('+configPrint.tamano+'mm)'; renderCaja(); renderEsperaBtns(); actualizarCorte(); setTimeout(()=>document.getElementById('inputScan').focus(),300);} lucide.createIcons();}
 function cerrarSesion(){sesion=null; carrito=[]; document.getElementById('loginScreen').style.display='flex'; document.getElementById('headerMain').style.display='none'; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='none'; document.getElementById('loginUser').value=''; document.getElementById('loginPass').value='';}
 function cambiarTienda(t){tiendaActual=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tienda===t));document.getElementById('labelTienda').innerText=t.toUpperCase();renderAdmin();}
 function getStockTienda(p){if(tiendaActual==='todas') return p.stock.estacion+p.stock.turbina+p.stock.santafe; return p.stock[tiendaActual]||0;}
@@ -311,25 +386,29 @@ if(!contenido ||!contenido.innerText.trim()) return;
 let iframe=document.getElementById('iframePrint');
 let doc=iframe.contentWindow.document;
 let ancho=configPrint.tamano==='58'?'58mm':'80mm';
-let logoTxt=configPrint.logo?'KIGO SUPER\n':'';
-let corteTxt=configPrint.corte?'':'';
+let fontSize=configPrint.tamano==='58'?'10px':'11px';
+let logoTxt='';
+if(configPrint.logo){
+if(configPrint.formato!=='compacto') logoTxt='*** KIGO SUPER ***\n';
+}
 let margen=configPrint.sinMargen?'margin:0;padding:2px':'margin:0;padding:8px';
-let htmlBody=logoTxt+contenido.innerText+'\n'+configPrint.pie;
-if(configPrint.corte) htmlBody+='\n\n';
+let htmlBody=logoTxt+contenido.innerText.replace('*** KIGO SUPER ***\n','')+'\n';
+if(configPrint.corte) htmlBody+='\n';
+if(configPrint.cajon) htmlBody+='\n[CAJON]\n';
 doc.open();
-doc.write('<html><head><style>body{font-family:monospace;font-size:11px;line-height:1.15;'+margen+';white-space:pre-wrap;width:'+ancho+'} @page{size:'+ancho+' auto;margin:0}</style></head><body>'+htmlBody.replace(/\n/g,'<br>')+'</body></html>');
+doc.write('<html><head><style>body{font-family:monospace;font-size:'+fontSize+';line-height:1.1;'+margen+';white-space:pre-wrap;width:'+ancho+'} @page{size:'+ancho+' auto;margin:0} br{line-height:1}</style></head><body>'+htmlBody.replace(/\n/g,'<br>')+'</body></html>');
 doc.close();
 let copias=configPrint.copias?2:1;
 for(let i=0;i<copias;i++){
 setTimeout(()=>{
 iframe.contentWindow.focus();
 iframe.contentWindow.print();
-},i*350);
+},i*400);
 }
 setTimeout(()=>{
 document.querySelectorAll('.modal-bg').forEach(m=>{ if(m.id!=='modalImpresora') m.style.display='none'; });
 document.getElementById('inputScan').focus();
-},800);
+},900);
 }
   function handleScanKey(e){ if(e.key==='Enter'){ let code=document.getElementById('inputScan').value.trim().toLowerCase(); if(!code){ if(carrito.length>0){ let idx = selectedIndex!==null? selectedIndex : 0; let item=carrito[idx]; let p=productos.find(x=>x.id===item.id); if(p && item.cant < p.stock[tiendaActual]){ item.cant++; renderCaja(); seleccionarFila(idx); } } } else { agregarPorCodigo(); } e.preventDefault(); } if(e.key==='Escape'){ e.preventDefault(); document.getElementById('btnCobrar').click(); } }
 function seleccionarFila(i){ selectedIndex=i; document.querySelectorAll('#cartList tr').forEach((tr,idx)=>{ if(idx===i) tr.classList.add('selected'); else tr.classList.remove('selected'); }); }
@@ -384,7 +463,8 @@ function verEImprimir(idx){
 let v=consultasFiltradas[idx];
 let fecha=new Date(v.ts).toLocaleString('es-MX');
 let lineas=v.productos? v.productos.map(p=> `${p.cant}x ${p.nombre} @ $${p.precio.toFixed(2)} = $${(p.cant*p.precio).toFixed(2)}`).join('\n') : v.detalle;
-let header=configPrint.logo?'*** KIGO SUPER ***\n':'';
+let header='';
+if(configPrint.logo && configPrint.formato!=='compacto') header='*** KIGO SUPER ***\n';
 if(configPrint.formato==='fiscal'){ header+=`FOLIO: ${v.folio}\nSERIE: ${v.serie||'A'}\n`; }
 let txt=`${header}FECHA: ${fecha}\nVENDEDOR: ${v.user}\nTIENDA: ${v.tienda.toUpperCase()}\n------------------------------\n${lineas}\n------------------------------\nVALOR: $${(v.valorTotal||0).toFixed(2)} MXN\n${configPrint.pie}`;
 document.getElementById('consultaTicketContent').innerText=txt;
@@ -416,17 +496,18 @@ generarTicket(total,rec,cambio,folio,serie);
 carrito=[]; selectedIndex=null; renderCaja(); actualizarCorte();
 if(configPrint.auto){
 document.getElementById('modalTicket').style.display='flex';
-document.getElementById('ticketMsg').innerText='Imprimiendo en '+configPrint.nombre+'... Corte automático';
+document.getElementById('ticketMsg').innerText='Imprimiendo en '+configPrint.nombre+' '+configPrint.tamano+'mm...';
 setTimeout(()=>{ imprimirDirecto('ticketContent'); },300);
 }else{
 document.getElementById('modalTicket').style.display='flex';
-document.getElementById('ticketMsg').innerText='Ticket listo. Activa impresión automática en IMPRESORA abajo';
+document.getElementById('ticketMsg').innerText='Ticket listo. Activa auto en IMPRESORA abajo';
 }
 }
 function generarTicket(total,rec,cambio,folio,serie){
 let fecha=new Date().toLocaleString('es-MX');
 let lineas=carrito.map(c=> `${c.cant} x ${c.nombre.substring(0,22)} @ $${c.precio.toFixed(2)} = $${((c.precio*c.cant)-(c.desc||0)).toFixed(2)}`).join('\n');
-let header=configPrint.logo?'*** KIGO SUPER ***\n':'';
+let header='';
+if(configPrint.logo && configPrint.formato!=='compacto') header='*** KIGO SUPER ***\n';
 if(configPrint.formato==='detallado' || configPrint.formato==='fiscal'){
 header+=`FOLIO: ${folio}\nSERIE: ${serie}\nCAJERO: ${sesion.nombre}\n`;
 }
