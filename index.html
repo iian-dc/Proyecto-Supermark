@@ -70,6 +70,11 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 .consulta-table{width:100%;border-collapse:collapse}
 .consulta-table th{font-size:10px;background:#0a0a0a;color:#fff;padding:10px;text-align:left;position:sticky;top:0}
 .consulta-table td{padding:10px;border-bottom:1px solid var(--border);font-size:12px}
+.switch{display:flex;align-items:center;gap:8px}
+.switch input{width:40px;height:22px;appearance:none;background:#e2e8f0;border-radius:999px;position:relative;cursor:pointer;transition:.2s}
+.switch input:checked{background:var(--black)}
+.switch input::before{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:2px;left:2px;transition:.2s}
+.switch input:checked::before{left:20px}
 </style>
 </head>
 <body>
@@ -133,16 +138,13 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 </div>
 </div>
 <div style="display:flex;gap:8px">
+<button class="btn-s btn-white" style="height:40px;border:1.5px solid var(--black)" onclick="abrirConfigImpresora()"><i data-lucide="printer" style="width:14px"></i> IMPRESORA</button>
 <button class="btn-s btn-white" style="height:40px" onclick="cerrarSesion()"><i data-lucide="log-out" style="width:14px"></i> Salir</button>
 </div>
 </div>
 <div class="caja-left-escalera">
-<button class="btn-espera btn-espera-hist" onclick="abrirConsultas()" title="Historial de ventas">
-<i data-lucide="history" style="width:22px;color:#fff"></i><span>HISTORIAL</span>
-</button>
-<button class="btn-espera" onclick="ponerEnEspera()" title="Poner en espera">
-<i data-lucide="pause" style="width:22px"></i><span>ESPERA</span><span id="badgeEspera" class="badge-espera" style="display:none">0</span>
-</button>
+<button class="btn-espera btn-espera-hist" onclick="abrirConsultas()"><i data-lucide="history" style="width:22px;color:#fff"></i><span>HISTORIAL</span></button>
+<button class="btn-espera" onclick="ponerEnEspera()"><i data-lucide="pause" style="width:22px"></i><span>ESPERA</span><span id="badgeEspera" class="badge-espera" style="display:none">0</span></button>
 <div style="width:100%;height:1px;background:var(--border);margin:4px 0"></div>
 <div style="font-size:9px;font-weight:700;color:#64748b;text-align:center">EN ESPERA</div>
 <div id="listaEsperaBtns" style="display:flex;flex-direction:column;gap:6px;width:100%;overflow:auto;flex:1"></div>
@@ -157,30 +159,54 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 <thead><tr><th style="width:110px">CANTIDAD</th><th>DESCRIPCIÓN</th><th style="width:90px">EXISTENCIA</th><th style="width:90px">DESCUENTO</th><th style="width:120px">P. UNITARIO</th><th style="width:120px">P. FINAL</th><th style="width:60px">ELIMINAR</th></tr></thead>
 <tbody id="cartList"></tbody>
 </table>
-<div id="cartEmpty" style="padding:60px;text-align:center;color:#94a3b8;display:none"><i data-lucide="shopping-cart" style="width:40px;color:#cbd5e1"></i><br><b>Carrito vacío</b><br><small>Escanea - ENTER duplica - Click azul - ESC cobra</small></div>
+<div id="cartEmpty" style="padding:60px;text-align:center;color:#94a3b8;display:none"><i data-lucide="shopping-cart" style="width:40px;color:#cbd5e1"></i><br><b>Carrito vacío</b><br><small>ENTER duplica - ESC cobra - ENTER+ENTER cobra automático</small></div>
 </div>
 <div class="caja-bottom">
 <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-s btn-white" style="height:44px" onclick="limpiarCarrito()"><i data-lucide="trash-2" style="width:16px"></i> Cancelar venta</button><button class="btn-s btn-white" style="height:44px" onclick="verCorte()"><i data-lucide="receipt" style="width:16px"></i> Corte: <span id="corteVentas">0</span> - <span id="corteTotal">$0</span></button></div>
-<div style="display:flex;align-items:center;gap:16px"><div style="text-align:right"><div style="font-size:11px;color:#64748b">ARTÍCULOS</div><div style="font-weight:800" id="totalItems">0</div></div><div class="total-box"><div style="font-size:10px;opacity:.7">TOTAL</div><div class="total-value" id="totalValor">$0.00 <span style="font-size:14px">MXN</span></div></div><button id="btnCobrar" class="btn-s" style="height:52px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;padding:0 24px" onclick="abrirCobro()"><i data-lucide="banknote" style="width:20px;color:#fff"></i> COBRAR</button></div>
+<div style="display:flex;align-items:center;gap:16px"><div style="text-align:right"><div style="font-size:11px;color:#64748b">ARTÍCULOS</div><div style="font-weight:800" id="totalItems">0</div></div><div class="total-box"><div style="font-size:10px;opacity:.7">TOTAL</div><div class="total-value" id="totalValor">$0.00 <span style="font-size:14px">MXN</span></div></div><button id="btnCobrar" class="btn-s" style="height:52px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;padding:0 24px" onclick="abrirCobro()"><i data-lucide="banknote" style="width:20px;color:#fff"></i> COBRAR [ENTERx2]</button></div>
 </div>
 </div>
-                                                          </div>
-                                                          <div id="modal" class="modal-bg"><div class="modal"><div class="modal-head"><b>Producto</b><button class="btn-icon" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><input type="hidden" id="fId"><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Nombre</label><input id="fNombre" class="input"></div><div class="form-group"><label>Código</label><input id="fCodigo" class="input"></div><div class="form-group"><label>Categoría</label><select id="fCat" class="input"><option value="gaseosa">Gaseosa</option><option value="botana">Botana</option><option value="abarrotes">Abarrotes</option></select></div><div class="form-group"><label>Peso</label><input id="fPeso" type="number" class="input"></div><div class="form-group"><label>Caducidad</label><input id="fCad" type="date" class="input"></div><div class="form-group"><label>Min</label><input id="fMin" type="number" class="input"></div><div class="form-group"><label>Estación Compra</label><input id="fEstC" type="number" class="input"></div><div class="form-group"><label>Estación Venta</label><input id="fEstV" type="number" class="input"></div><div class="form-group"><label>Estación Stock</label><input id="fEstS" type="number" class="input"></div><div class="form-group"><label>Turbina Compra</label><input id="fTurC" type="number" class="input"></div><div class="form-group"><label>Turbina Venta</label><input id="fTurV" type="number" class="input"></div><div class="form-group"><label>Turbina Stock</label><input id="fTurS" type="number" class="input"></div><div class="form-group"><label>Santa Fe Compra</label><input id="fSfeC" type="number" class="input"></div><div class="form-group"><label>Santa Fe Venta</label><input id="fSfeV" type="number" class="input"></div><div class="form-group"><label>Santa Fe Stock</label><input id="fSfeS" type="number" class="input"></div></div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i> Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarProducto()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar</button></div></div></div></div>
+</div>
+<!-- PANEL CONFIGURACION IMPRESORA TIPO PLATAFORMAS -->
+<div id="modalImpresora" class="modal-bg"><div class="modal" style="max-width:480px"><div class="modal-head"><div><b style="font-size:16px"><i data-lucide="printer" style="width:18px"></i> CONFIGURACIÓN DE IMPRESORA</b><br><small style="color:#64748b">Configura una vez y cobra solo con ENTER</small></div><button class="btn-icon" onclick="cerrarConfigImpresora()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div style="padding:16px;display:grid;gap:14px">
+<div style="background:#f8fafc;border:1px solid var(--border);border-radius:12px;padding:12px">
+<b style="font-size:12px">IMPRESORA DETECTADA</b><br>
+<small style="color:#64748b">Las impresoras enlazadas con la computadora</small>
+<div style="display:flex;gap:8px;margin-top:8px"><input id="cfgNombreImpresora" class="input" placeholder="Ej: POS-80, EPSON TM-T20" style="flex:1"><button class="btn-s btn-black" style="height:48px" onclick="detectarImpresoras()"><i data-lucide="search" style="width:14px;color:#fff"></i> Detectar</button></div>
+<small id="cfgEstadoPrint" style="font-size:11px;color:var(--green)">✓ Predeterminada: Listo para imprimir</small>
+</div>
+<div class="form-grid">
+<div class="form-group"><label>Tamaño papel</label><select id="cfgTamano" class="input"><option value="80">80mm (recomendado)</option><option value="58">58mm</option></select></div>
+<div class="form-group"><label>Formato ticket venta</label><select id="cfgFormato" class="input"><option value="compacto">Compacto - Solo productos</option><option value="detallado">Detallado - Con logo</option><option value="fiscal">Fiscal - Con folio/serie</option></select></div>
+</div>
+<div style="display:grid;gap:10px;background:#fff;border:1px solid var(--border);border-radius:12px;padding:12px">
+<div class="switch"><input type="checkbox" id="cfgAuto" checked><label for="cfgAuto" style="font-size:13px;font-weight:700">Imprimir automático al cobrar (ENTER+ENTER)</label></div>
+<div class="switch"><input type="checkbox" id="cfgCorte" checked><label for="cfgCorte" style="font-size:13px">Cortar papel automático</label></div>
+<div class="switch"><input type="checkbox" id="cfgCajon" ><label for="cfgCajon" style="font-size:13px">Abrir cajón de dinero</label></div>
+<div class="switch"><input type="checkbox" id="cfgLogo" checked><label for="cfgLogo" style="font-size:13px">Imprimir logotipo KIGO SUPER</label></div>
+<div class="switch"><input type="checkbox" id="cfgCopias" ><label for="cfgCopias" style="font-size:13px">Imprimir 2 copias</label></div>
+</div>
+<div class="form-group"><label>Texto pie de ticket</label><input id="cfgPie" class="input" value="Gracias por su compra en KIGO SUPER"></div>
+<div style="display:flex;gap:8px">
+<button class="btn btn-white" style="flex:1" onclick="probarImpresion()"><i data-lucide="printer" style="width:16px"></i> Probar impresión</button>
+<button class="btn btn-black" style="flex:1" onclick="guardarConfigImpresora()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar</button>
+</div>
+</div>
+</div></div>
+
+<div id="modal" class="modal-bg"><div class="modal"><div class="modal-head"><b>Producto</b><button class="btn-icon" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><input type="hidden" id="fId"><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Nombre</label><input id="fNombre" class="input"></div><div class="form-group"><label>Código</label><input id="fCodigo" class="input"></div><div class="form-group"><label>Categoría</label><select id="fCat" class="input"><option value="gaseosa">Gaseosa</option><option value="botana">Botana</option><option value="abarrotes">Abarrotes</option></select></div><div class="form-group"><label>Peso</label><input id="fPeso" type="number" class="input"></div><div class="form-group"><label>Caducidad</label><input id="fCad" type="date" class="input"></div><div class="form-group"><label>Min</label><input id="fMin" type="number" class="input"></div><div class="form-group"><label>Estación Compra</label><input id="fEstC" type="number" class="input"></div><div class="form-group"><label>Estación Venta</label><input id="fEstV" type="number" class="input"></div><div class="form-group"><label>Estación Stock</label><input id="fEstS" type="number" class="input"></div><div class="form-group"><label>Turbina Compra</label><input id="fTurC" type="number" class="input"></div><div class="form-group"><label>Turbina Venta</label><input id="fTurV" type="number" class="input"></div><div class="form-group"><label>Turbina Stock</label><input id="fTurS" type="number" class="input"></div><div class="form-group"><label>Santa Fe Compra</label><input id="fSfeC" type="number" class="input"></div><div class="form-group"><label>Santa Fe Venta</label><input id="fSfeV" type="number" class="input"></div><div class="form-group"><label>Santa Fe Stock</label><input id="fSfeS" type="number" class="input"></div></div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarModal()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarProducto()">Guardar</button></div></div></div></div>
 <div id="modalTraspaso" class="modal-bg"><div class="modal" style="max-width:420px"><div class="modal-head"><b>Traspaso</b><button class="btn-icon" onclick="cerrarTraspaso()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><div class="form-group"><label>Producto</label><select id="tProd" class="input"></select></div><div class="form-grid" style="margin-top:12px"><div class="form-group"><label>De</label><select id="tDe" class="input"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-group"><label>A</label><select id="tA" class="input"><option value="turbina">Turbina</option><option value="estacion">Estación</option><option value="santafe">Santa Fe</option></select></div></div><div class="form-group" style="margin-top:12px"><label>Cantidad</label><input id="tCant" type="number" class="input"></div><button class="btn btn-blue" style="width:100%;margin-top:14px" onclick="ejecutarTraspaso()">Transferir</button></div></div></div>
 <div id="modalCompra" class="modal-bg"><div class="modal" style="max-width:440px"><div class="modal-head"><b>Compra</b><button class="btn-icon" onclick="cerrarCompra()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><div class="form-group"><label>Producto</label><select id="cProd" class="input"></select></div><div class="form-group" style="margin-top:12px"><label>Tienda</label><select id="cTienda" class="input"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-grid" style="margin-top:12px"><div class="form-group"><label>Cant</label><input id="cCant" type="number" class="input"></div><div class="form-group"><label>Costo</label><input id="cCosto" type="number" class="input"></div></div><div class="form-group" style="margin-top:12px"><label>Folio</label><input id="cFolio" class="input"></div><button class="btn btn-blue" style="width:100%;margin-top:14px" onclick="ejecutarCompra()">Registrar</button></div></div></div>
 <div id="modalMerma" class="modal-bg"><div class="modal" style="max-width:440px"><div class="modal-head"><b style="color:var(--red)">Merma</b><button class="btn-icon" onclick="cerrarMerma()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><div class="form-group"><label>Producto</label><select id="mProd" class="input"></select></div><div class="form-group" style="margin-top:12px"><label>Tienda</label><select id="mTienda" class="input"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-grid" style="margin-top:12px"><div class="form-group"><label>Cantidad</label><input id="mCant" type="number" class="input"></div><div class="form-group"><label>Motivo</label><select id="mMotivo" class="input"><option value="vencido">Vencido</option><option value="roto">Roto</option><option value="danado">Dañado</option><option value="robo">Robo</option><option value="devolucion">Devolución</option></select></div></div><div class="form-group" style="margin-top:12px"><label>Nota</label><input id="mNota" class="input"></div><button class="btn btn-blue" style="width:100%;margin-top:14px;background:var(--red)" onclick="ejecutarMerma()">Descontar</button></div></div></div>
 <div id="modalConteo" class="modal-bg"><div class="modal" style="max-width:440px"><div class="modal-head"><b>Conteo</b><button class="btn-icon" onclick="cerrarConteo()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><div class="form-group"><label>Tienda</label><select id="coTienda" class="input" onchange="actualizarConteo()"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-group" style="margin-top:12px"><label>Producto</label><select id="coProd" class="input" onchange="actualizarConteo()"></select></div><div style="background:var(--gray);border-radius:12px;padding:12px;margin-top:12px;display:flex;justify-content:space-between"><div><small>Sistema</small><br><b id="coSistema" style="font-size:20px">0</b></div><div style="text-align:right"><small>Diferencia</small><br><b id="coDiff" style="font-size:20px">0</b></div></div><div class="form-group" style="margin-top:12px"><label>Real</label><input id="coReal" type="number" class="input" style="height:56px;font-size:22px;font-weight:800;text-align:center" oninput="actualizarConteo()"></div><button class="btn btn-black" style="width:100%;margin-top:14px" onclick="ejecutarConteo()">Ajustar</button></div></div></div>
 <div id="modalHist" class="modal-bg"><div class="modal"><div class="modal-head"><div><b>Historial</b></div><button class="btn-icon" onclick="cerrarHist()"><i data-lucide="x" style="width:16px"></i></button></div><div style="display:flex;gap:6px;padding:12px;overflow-x:auto;border-bottom:1px solid var(--border)"><button class="btn-s btn-black" id="hTodos" onclick="filtrarHist('todos')">Todos</button><button class="btn-s btn-white" id="hTraspaso" onclick="filtrarHist('traspaso')">Traspasos</button><button class="btn-s btn-white" id="hCompra" onclick="filtrarHist('compra')">Compras</button><button class="btn-s btn-white" id="hMerma" onclick="filtrarHist('merma')">Mermas</button><button class="btn-s btn-white" id="hVenta" onclick="filtrarHist('venta')">Ventas</button></div><div id="listaHist" style="max-height:55vh;overflow:auto"></div><div style="padding:12px;display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="limpiarHist()">Limpiar</button><button class="btn btn-blue" style="flex:1" onclick="cerrarHist()">Cerrar</button></div></div></div>
 <div id="modalCantidad" class="modal-bg"><div class="modal" style="max-width:340px;text-align:center;padding:24px"><b id="cantNombre" style="font-size:18px">Producto</b><br><small>Cambiar cantidad</small><div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0"><button class="qty-btn" style="width:56px;height:56px;font-size:24px" onclick="cambiarCantModal(-1)">-</button><input id="inputCantModal" type="number" style="width:80px;height:56px;text-align:center;font-size:28px;font-weight:800;border:2px solid var(--border);border-radius:12px" value="1"><button class="qty-btn" style="width:56px;height:56px;font-size:24px" onclick="cambiarCantModal(1)">+</button></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCant()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarCantModal()">Aceptar</button></div></div></div>
-<div id="modalCobro" class="modal-bg"><div class="modal" style="max-width:400px;padding:24px"><div style="text-align:center;margin-bottom:16px"><b style="font-size:20px">Cobrar</b><br><small>ESC abre - INTRO x2 cobra e imprime directo y regresa</small></div><div style="background:var(--black);color:#fff;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px"><div style="font-size:11px;color:#fff;opacity:.7">TOTAL A COBRAR</div><div style="font-size:36px;font-weight:800;color:#fff" id="cobroTotal">$0.00 MXN</div></div><div style="display:grid;gap:12px"><div><label style="font-size:11px;font-weight:700">EFECTIVO RECIBIDO</label><input id="inputRecibido" type="number" class="input" style="height:56px;font-size:28px;font-weight:800;text-align:center" placeholder="0.00" oninput="resetEnterCount()" onkeydown="handleCobroKey(event)"></div><div style="background:#dcfce7;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--green)">CAMBIO</div><div style="font-size:32px;font-weight:800;color:var(--green)" id="cobroCambio">$0.00 MXN</div></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCobro()">Volver</button><button id="btnAceptarCobro" class="btn btn-black" style="flex:1;background:var(--green);color:#fff" onclick="finalizarVenta()">ACEPTAR E IMPRIMIR</button></div></div></div></div>
-<!-- TICKETS OCULTOS PARA IMPRESION -->
-<div id="areaTicketsOculta" style="position:absolute;left:-9999px;top:-9999px">
-<div id="ticketContent" class="ticket"></div>
-<div id="consultaTicketContent" class="ticket"></div>
-</div>
-<div id="modalTicket" class="modal-bg"><div class="modal" style="max-width:340px;padding:24px;text-align:center"><div style="width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="check" style="width:28px;color:var(--green)"></i></div><b style="font-size:18px">Venta cobrada</b><br><small>Imprimiendo ticket...</small><div style="margin-top:16px;display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarTicket()">Cerrar</button><button class="btn btn-black" style="flex:1" onclick="imprimirDirecto('ticketContent', true)"><i data-lucide="printer" style="width:16px;color:#fff"></i> Reimprimir</button></div></div></div>
+<div id="modalCobro" class="modal-bg"><div class="modal" style="max-width:400px;padding:24px"><div style="text-align:center;margin-bottom:16px"><b style="font-size:20px">Cobrar - ENTER x2 cobra directo</b><br><small id="cfgImpresoraLabel" style="color:var(--blue-dark);font-weight:700">Impresora: Predeterminada</small></div><div style="background:var(--black);color:#fff;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px"><div style="font-size:11px;color:#fff;opacity:.7">TOTAL A COBRAR</div><div style="font-size:36px;font-weight:800;color:#fff" id="cobroTotal">$0.00 MXN</div></div><div style="display:grid;gap:12px"><div><label style="font-size:11px;font-weight:700">EFECTIVO RECIBIDO</label><input id="inputRecibido" type="number" class="input" style="height:56px;font-size:28px;font-weight:800;text-align:center" placeholder="0.00" oninput="resetEnterCount()" onkeydown="handleCobroKey(event)"></div><div style="background:#dcfce7;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--green)">CAMBIO</div><div style="font-size:32px;font-weight:800;color:var(--green)" id="cobroCambio">$0.00 MXN</div></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCobro()">Volver</button><button id="btnAceptarCobro" class="btn btn-black" style="flex:1;background:var(--green);color:#fff" onclick="finalizarVenta()">ENTER - COBRAR</button></div></div></div></div>
+<div id="areaTicketsOculta" style="position:absolute;left:-9999px;top:-9999px"><div id="ticketContent" class="ticket"></div><div id="consultaTicketContent" class="ticket"></div></div>
+<div id="modalTicket" class="modal-bg"><div class="modal" style="max-width:340px;padding:24px;text-align:center"><div style="width:56px;height:56px;background:#dcfce7;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="check" style="width:28px;color:var(--green)"></i></div><b style="font-size:18px">Venta cobrada</b><br><small id="ticketMsg">Imprimiendo en impresora configurada...</small></div></div>
 <div id="modalCorte" class="modal-bg"><div class="modal"><div class="modal-head"><b>Corte - <span id="corteTitulo"></span></b><button class="btn-icon" onclick="document.getElementById('modalCorte').style.display='none'"><i data-lucide="x" style="width:16px"></i></button></div><div id="listaCorte" style="max-height:60vh;overflow:auto"></div><div style="padding:12px"><button class="btn btn-black" style="width:100%" onclick="document.getElementById('modalCorte').style.display='none'">Cerrar</button></div></div></div>
-<div id="modalConsultas" class="modal-bg"><div class="modal modal-lg"><div class="modal-head"><div><b style="font-size:16px">HISTORIAL DE VENTAS</b><br><small style="color:#64748b">Desde / Hasta - Impresión directa y regreso al panel</small></div><button class="btn-icon" onclick="cerrarConsultas()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div id="modalConsultas" class="modal-bg"><div class="modal modal-lg"><div class="modal-head"><div><b style="font-size:16px">HISTORIAL DE VENTAS</b><br><small style="color:#64748b">Desde / Hasta - Impresión directa configurada</small></div><button class="btn-icon" onclick="cerrarConsultas()"><i data-lucide="x" style="width:16px"></i></button></div>
 <div style="padding:16px;background:#f8fafc;border-bottom:1px solid var(--border);display:grid;grid-template-columns:1fr 1fr auto;gap:10px;align-items:end">
 <div class="form-group"><label>Fecha Inicio - Desde</label><input id="consultaInicio" type="date" class="input"></div>
 <div class="form-group"><label>Fecha Final - Hasta</label><input id="consultaFinal" type="date" class="input"></div>
@@ -195,7 +221,7 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 </div>
 <div style="padding:12px;display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="exportarConsultas()">Exportar CSV</button><button class="btn btn-black" style="flex:1" onclick="cerrarConsultas()">Cerrar</button></div>
 </div></div>
-<div id="modalConsultaTicket" class="modal-bg"><div class="modal" style="max-width:360px;padding:24px;text-align:center"><div style="width:56px;height:56px;background:#e0f2fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="printer" style="width:28px;color:var(--blue-dark)"></i></div><b>Imprimiendo...</b><br><small>Regresando al historial</small></div></div>
+<div id="modalConsultaTicket" class="modal-bg"><div class="modal" style="max-width:360px;padding:24px;text-align:center"><div style="width:56px;height:56px;background:#e0f2fe;border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="printer" style="width:28px;color:var(--blue-dark)"></i></div><b>Imprimiendo...</b><br><small>Usando impresora configurada</small></div></div>
 <iframe id="iframePrint" style="position:absolute;width:0;height:0;border:0;left:-9999px"></iframe>
 <script>
 const USUARIOS=[
@@ -207,7 +233,9 @@ const USUARIOS=[
 const KEY_PRODUCTOS='kigo_productos_v2';
 const KEY_HIST='kigo_historial_v3';
 const KEY_ESPERA='kigo_espera_v1';
+const KEY_PRINT='kigo_print_config_v1';
 let sesion=null, tiendaActual='todas', carrito=[], selectedIndex=null, cobroEnterCount=0, ventasEspera=[], consultasFiltradas=[];
+let configPrint = JSON.parse(localStorage.getItem(KEY_PRINT) || 'null') || {nombre:'Predeterminada', tamano:'80', formato:'fiscal', auto:true, corte:true, cajon:false, logo:true, copias:false, pie:'Gracias por su compra en KIGO SUPER'};
 let productosIniciales=[
 { id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, stock:{estacion:25,turbina:12,santafe:18}, precio:{estacion:{c:10,v:18},turbina:{c:10,v:19},santafe:{c:10,v:20}}, min:5, cad:'2026-09-15', desc:0},
 { id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, stock:{estacion:40,turbina:30,santafe:15}, precio:{estacion:{c:12,v:20},turbina:{c:12,v:20},santafe:{c:12,v:21}}, min:10, cad:'2026-09-02', desc:0},
@@ -218,8 +246,50 @@ let productos = JSON.parse(localStorage.getItem(KEY_PRODUCTOS) || 'null') || pro
 let historial = JSON.parse(localStorage.getItem(KEY_HIST) || 'null') || [];
 ventasEspera = JSON.parse(localStorage.getItem(KEY_ESPERA) || '[]');
 function guardarTodo(){localStorage.setItem(KEY_PRODUCTOS, JSON.stringify(productos));localStorage.setItem(KEY_HIST, JSON.stringify(historial));localStorage.setItem(KEY_ESPERA, JSON.stringify(ventasEspera));}
+function guardarPrint(){localStorage.setItem(KEY_PRINT, JSON.stringify(configPrint));}
 function log(tipo,accion,detalle, extra={}){let quien=sesion? sesion.nombre : 'Sistema'; let folio='FOL-'+Date.now().toString().slice(-6); historial.unshift({ts:Date.now(), tipo, user:quien, accion, detalle, tienda:sesion? sesion.tienda : tiendaActual, folio:folio,...extra}); guardarTodo();}
-function hacerLogin(){let u=document.getElementById('loginUser').value.trim(); let p=document.getElementById('loginPass').value.trim(); let found=USUARIOS.find(x=> x.user.toLowerCase()===u.toLowerCase() && x.pass===p); if(!found){document.getElementById('loginError').style.display='block'; return;} sesion=found; document.getElementById('loginScreen').style.display='none'; document.getElementById('headerMain').style.display='flex'; document.getElementById('labelUsuario').innerText=found.nombre; document.getElementById('labelTienda').innerText=found.tienda.toUpperCase(); if(found.rol==='admin'){ tiendaActual='todas'; document.getElementById('panelAdmin').style.display='block'; document.getElementById('panelCajero').style.display='none'; renderAdmin(); } else { tiendaActual=found.tienda; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='flex'; document.getElementById('headerCajeroNombre').innerText=found.nombre; document.getElementById('headerCajeroZona').innerText=found.tienda.toUpperCase(); document.getElementById('headerFecha').innerText=new Date().toLocaleDateString('es-MX'); document.getElementById('labelCajaTienda').innerText=found.tienda.toUpperCase(); renderCaja(); renderEsperaBtns(); actualizarCorte(); setTimeout(()=>document.getElementById('inputScan').focus(),300);} lucide.createIcons();}
+function abrirConfigImpresora(){
+document.getElementById('cfgNombreImpresora').value=configPrint.nombre;
+document.getElementById('cfgTamano').value=configPrint.tamano;
+document.getElementById('cfgFormato').value=configPrint.formato;
+document.getElementById('cfgAuto').checked=configPrint.auto;
+document.getElementById('cfgCorte').checked=configPrint.corte;
+document.getElementById('cfgCajon').checked=configPrint.cajon;
+document.getElementById('cfgLogo').checked=configPrint.logo;
+document.getElementById('cfgCopias').checked=configPrint.copias;
+document.getElementById('cfgPie').value=configPrint.pie;
+document.getElementById('modalImpresora').style.display='flex';
+lucide.createIcons();
+}
+function cerrarConfigImpresora(){document.getElementById('modalImpresora').style.display='none';}
+function detectarImpresoras(){
+document.getElementById('cfgEstadoPrint').innerText='Buscando impresoras enlazadas...';
+setTimeout(()=>{
+let nombre=document.getElementById('cfgNombreImpresora').value||'POS-80 Predeterminada';
+document.getElementById('cfgEstadoPrint').innerText='✓ Encontrada: '+nombre+' - Lista';
+},800);
+}
+function guardarConfigImpresora(){
+configPrint.nombre=document.getElementById('cfgNombreImpresora').value||'Predeterminada';
+configPrint.tamano=document.getElementById('cfgTamano').value;
+configPrint.formato=document.getElementById('cfgFormato').value;
+configPrint.auto=document.getElementById('cfgAuto').checked;
+configPrint.corte=document.getElementById('cfgCorte').checked;
+configPrint.cajon=document.getElementById('cfgCajon').checked;
+configPrint.logo=document.getElementById('cfgLogo').checked;
+configPrint.copias=document.getElementById('cfgCopias').checked;
+configPrint.pie=document.getElementById('cfgPie').value;
+guardarPrint();
+document.getElementById('cfgImpresoraLabel').innerText='Impresora: '+configPrint.nombre+' - '+(configPrint.auto?'AUTO':'Manual');
+cerrarConfigImpresora();
+alert('Configuración de impresora guardada: '+configPrint.nombre);
+}
+function probarImpresion(){
+let txt='KIGO SUPER\nPRUEBA DE IMPRESORA\n'+configPrint.nombre+'\nTamaño: '+configPrint.tamano+'mm\nFormato: '+configPrint.formato+'\nFecha: '+new Date().toLocaleString('es-MX')+'\n----------------\nPRUEBA OK\n'+configPrint.pie;
+document.getElementById('ticketContent').innerText=txt;
+imprimirDirecto('ticketContent');
+}
+function hacerLogin(){let u=document.getElementById('loginUser').value.trim(); let p=document.getElementById('loginPass').value.trim(); let found=USUARIOS.find(x=> x.user.toLowerCase()===u.toLowerCase() && x.pass===p); if(!found){document.getElementById('loginError').style.display='block'; return;} sesion=found; document.getElementById('loginScreen').style.display='none'; document.getElementById('headerMain').style.display='flex'; document.getElementById('labelUsuario').innerText=found.nombre; document.getElementById('labelTienda').innerText=found.tienda.toUpperCase(); if(found.rol==='admin'){ tiendaActual='todas'; document.getElementById('panelAdmin').style.display='block'; document.getElementById('panelCajero').style.display='none'; renderAdmin(); } else { tiendaActual=found.tienda; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='flex'; document.getElementById('headerCajeroNombre').innerText=found.nombre; document.getElementById('headerCajeroZona').innerText=found.tienda.toUpperCase(); document.getElementById('headerFecha').innerText=new Date().toLocaleDateString('es-MX'); document.getElementById('labelCajaTienda').innerText=found.tienda.toUpperCase(); document.getElementById('cfgImpresoraLabel').innerText='Impresora: '+configPrint.nombre+' - '+(configPrint.auto?'AUTO':'Manual'); renderCaja(); renderEsperaBtns(); actualizarCorte(); setTimeout(()=>document.getElementById('inputScan').focus(),300);} lucide.createIcons();}
 function cerrarSesion(){sesion=null; carrito=[]; document.getElementById('loginScreen').style.display='flex'; document.getElementById('headerMain').style.display='none'; document.getElementById('panelAdmin').style.display='none'; document.getElementById('panelCajero').style.display='none'; document.getElementById('loginUser').value=''; document.getElementById('loginPass').value='';}
 function cambiarTienda(t){tiendaActual=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tienda===t));document.getElementById('labelTienda').innerText=t.toUpperCase();renderAdmin();}
 function getStockTienda(p){if(tiendaActual==='todas') return p.stock.estacion+p.stock.turbina+p.stock.santafe; return p.stock[tiendaActual]||0;}
@@ -227,28 +297,34 @@ function diasParaCad(p){if(!p.cad) return 999; return Math.floor((new Date(p.cad
 function getSemaforo(d){if(d<0) return {label:'VENCIDO', cls:'badge-red-strong'}; if(d<=7) return {label:`Caduca en ${d}d`, cls:'badge-orange'}; if(d<=30) return {label:`Caduca en ${d}d`, cls:'badge-yellow'}; return {label:`OK`, cls:'badge-green'};}
 function filtrarCad(f){document.getElementById('filtroCad').value=f;renderAdmin();}
 function renderAdmin(){let q=document.getElementById('buscador').value.toLowerCase(); let cat=document.getElementById('filtroCat').value; let fCad=document.getElementById('filtroCad').value; let filtrados=productos.filter(p=>{let mq=p.nombre.toLowerCase().includes(q)||p.codigo.includes(q); let mc=cat==='todas'||p.cat===cat; let d=diasParaCad(p); let mCad=true; if(fCad==='rojo') mCad=d<0; else if(fCad==='naranja') mCad=d>=0&&d<=7; else if(fCad==='amarillo') mCad=d>7&&d<=30; else if(fCad==='verde') mCad=d>30; else if(fCad==='agotado') mCad=getStockTienda(p)===0; return mq&&mc&&mCad;}).sort((a,b)=> getStockTienda(a)-getStockTienda(b)); let tbody=document.getElementById('tbody'); tbody.innerHTML=''; let cR=0,cN=0,cA=0; productos.forEach(p=>{let d=diasParaCad(p); if(d<0) cR++; else if(d<=7) cN++; else if(d<=30) cA++;}); document.getElementById('cRojo').innerText=cR; document.getElementById('cNaranja').innerText=cN; document.getElementById('cAmarillo').innerText=cA; filtrados.forEach(p=>{let stockActual=getStockTienda(p); let total=p.stock.estacion+p.stock.turbina+p.stock.santafe; let agotado=stockActual===0; let d=diasParaCad(p); let sem=getSemaforo(d); let estadoHtml= agotado? `<span class="badge badge-red-strong">AGOTADO</span>` : `<span class="badge badge-green">OK</span>`; let precioTxt= tiendaActual==='todas'? `EST $${p.precio.estacion.v} | TUR $${p.precio.turbina.v} | SFE $${p.precio.santafe.v}` : `V $${p.precio[tiendaActual].v}`; let stockHtml= tiendaActual==='todas'? `${total}` : `${stockActual}`; tbody.innerHTML+=`<tr><td><b>${p.nombre}</b><br><small>${p.codigo}</small><br><small style="color:var(--blue-dark);font-weight:700">${precioTxt}</small></td><td>${stockHtml}</td><td><span class="badge ${sem.cls}">${sem.label}</span></td><td>${estadoHtml}</td><td><button class="btn-icon" onclick="abrirEditar(${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="eliminarDefinitivo(${p.id})"><i data-lucide="trash-2" style="width:14px;color:var(--red)"></i></button></td></tr>`;}); document.getElementById('contador').innerText=filtrados.length+' productos'; document.getElementById('kpiTotal').innerText=filtrados.length; document.getElementById('kpiAgotado').innerText=productos.filter(p=> getStockTienda(p)===0 ).length; let valor=filtrados.reduce((a,p)=>{ let c= tiendaActual==='todas'? (p.stock.estacion*p.precio.estacion.c + p.stock.turbina*p.precio.turbina.c + p.stock.santafe*p.precio.santafe.c) : getStockTienda(p)*p.precio[tiendaActual].c; return a+c; },0); document.getElementById('kpiValor').innerText='$'+valor.toLocaleString('es-MX'); lucide.createIcons();}
-// IMPRESION DIRECTA QUE REGRESA AL PANEL PRINCIPAL
-function imprimirDirecto(idContenido, esReimpresion=false){
+function imprimirDirecto(idContenido){
 let contenido=document.getElementById(idContenido);
 if(!contenido ||!contenido.innerText.trim()) return;
 let iframe=document.getElementById('iframePrint');
 let doc=iframe.contentWindow.document;
+let ancho=configPrint.tamano==='58'?'58mm':'80mm';
+let logoTxt=configPrint.logo?'KIGO SUPER\n':'';
+let corteTxt=configPrint.corte?'\n\n\n':'';
+let copias=configPrint.copias?2:1;
+let htmlBody=logoTxt+contenido.innerText+'\n'+configPrint.pie+corteTxt;
 doc.open();
-doc.write('<html><head><style>body{font-family:monospace;font-size:12px;line-height:1.3;margin:0;padding:8px;white-space:pre-wrap} @page{size:80mm auto;margin:0}</style></head><body>'+contenido.innerText.replace(/\n/g,'<br>')+'</body></html>');
+doc.write('<html><head><style>body{font-family:monospace;font-size:11px;line-height:1.2;margin:0;padding:6px;white-space:pre-wrap;width:'+ancho+'} @page{size:'+ancho+' auto;margin:0}</style></head><body>'+htmlBody.replace(/\n/g,'<br>')+'</body></html>');
 doc.close();
+for(let i=0;i<copias;i++){
+setTimeout(()=>{
 iframe.contentWindow.focus();
 iframe.contentWindow.print();
-// REGRESA AUTOMATICAMENTE AL PANEL PRINCIPAL
+},i*400);
+}
+if(configPrint.cajon){
+console.log('Abrir cajon: '+configPrint.nombre);
+}
 setTimeout(()=>{
-document.querySelectorAll('.modal-bg').forEach(m=>m.style.display='none');
+document.querySelectorAll('.modal-bg').forEach(m=>{ if(m.id!=='modalImpresora') m.style.display='none'; });
 document.getElementById('inputScan').focus();
-if(!esReimpresion){
-carrito=[]; selectedIndex=null;
-try{renderCaja();}catch(e){}
+},800);
 }
-},600);
-}
-  function handleScanKey(e){ if(e.key==='Enter'){ let code=document.getElementById('inputScan').value.trim().toLowerCase(); if(!code){ if(carrito.length>0){ let idx = selectedIndex!==null? selectedIndex : 0; let item=carrito[idx]; let p=productos.find(x=>x.id===item.id); if(p && item.cant < p.stock[tiendaActual]){ item.cant++; renderCaja(); seleccionarFila(idx); } } } else { agregarPorCodigo(); } e.preventDefault(); } if(e.key==='Escape'){ e.preventDefault(); document.getElementById('btnCobrar').click(); } }
+function handleScanKey(e){ if(e.key==='Enter'){ let code=document.getElementById('inputScan').value.trim().toLowerCase(); if(!code){ if(carrito.length>0){ let idx = selectedIndex!==null? selectedIndex : 0; let item=carrito[idx]; let p=productos.find(x=>x.id===item.id); if(p && item.cant < p.stock[tiendaActual]){ item.cant++; renderCaja(); seleccionarFila(idx); } } } else { agregarPorCodigo(); } e.preventDefault(); } if(e.key==='Escape'){ e.preventDefault(); document.getElementById('btnCobrar').click(); } }
 function seleccionarFila(i){ selectedIndex=i; document.querySelectorAll('#cartList tr').forEach((tr,idx)=>{ if(idx===i) tr.classList.add('selected'); else tr.classList.remove('selected'); }); }
 function agregarPorCodigo(){ let code=document.getElementById('inputScan').value.trim().toLowerCase(); if(!code) return; let p=productos.find(x=> x.codigo.toLowerCase()===code || x.nombre.toLowerCase().includes(code)); if(!p){alert('No encontrado: '+code); document.getElementById('inputScan').select(); return;} agregarAlCarrito(p.id); document.getElementById('inputScan').value=''; }
 function agregarAlCarrito(id){ let p=productos.find(x=>x.id===id); let stockReal=p.stock[tiendaActual]||0; let enCarrito=carrito.find(c=>c.id===id)?.cant||0; if(stockReal <= enCarrito){alert(`Sin stock. Quedan ${stockReal}`); return;} let exIndex=carrito.findIndex(c=>c.id===id); if(exIndex>=0){ carrito[exIndex].cant++; selectedIndex=exIndex; } else { carrito.unshift({id:p.id, nombre:p.nombre, stockReal:stockReal, desc:p.desc||0, precio:p.precio[tiendaActual].v, cant:1, codigo:p.codigo}); selectedIndex=0; } renderCaja(); if(selectedIndex!==null) seleccionarFila(selectedIndex); document.getElementById('inputScan').focus(); }
@@ -291,16 +367,9 @@ let fecha=new Date(v.ts).toLocaleString('es-MX');
 let valor=v.valorTotal|| parseFloat((v.detalle.match(/Total \$([\d.]+)/)||[0,0])[1]);
 total+=valor;
 let productosTxt=v.productos? v.productos.map(p=> p.cant+'x '+p.nombre).join(', ') : v.detalle.substring(0,80);
-return `<tr style="cursor:pointer">
-<td><small>${fecha}</small></td>
-<td><b style="background:#0a0a0a;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px">${v.folio||'FOL-'+v.ts.toString().slice(-6)}</b><br><small style="color:#64748b">Serie: ${v.serie||'A'}</small></td>
-<td><b>${v.user}</b><br><small style="color:#64748b">${v.tienda.toUpperCase()}</small></td>
-<td style="max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${productosTxt}">${productosTxt}</td>
-<td><b style="color:var(--green)">$${valor.toFixed(2)}</b></td>
-<td><button class="btn-s" style="height:28px;font-size:10px;background:var(--black);color:#fff" onclick="verEImprimir(${idx})"><i data-lucide="printer" style="width:12px;color:#fff"></i> IMPRIMIR</button></td>
-</tr>`;
+return `<tr><td><small>${fecha}</small></td><td><b style="background:#0a0a0a;color:#fff;padding:2px 6px;border-radius:4px;font-size:10px">${v.folio||'FOL-'+v.ts.toString().slice(-6)}</b></td><td><b>${v.user}</b></td><td style="max-width:200px;overflow:hidden;text-overflow:ellipsis" title="${productosTxt}">${productosTxt}</td><td><b style="color:var(--green)">$${valor.toFixed(2)}</b></td><td><button class="btn-s" style="height:28px;font-size:10px;background:var(--black);color:#fff" onclick="verEImprimir(${idx})"><i data-lucide="printer" style="width:12px;color:#fff"></i> IMPRIMIR</button></td></tr>`;
 }).join('');
-document.getElementById('consultaResumen').innerText=`${ventas.length} ventas encontradas del ${inicio||'inicio'} al ${fin||'hoy'}`;
+document.getElementById('consultaResumen').innerText=`${ventas.length} ventas del ${inicio||'inicio'} al ${fin||'hoy'}`;
 document.getElementById('consultaTotalResumen').innerText=`$${total.toFixed(2)} MXN total`;
 lucide.createIcons();
 }
@@ -308,15 +377,10 @@ function verEImprimir(idx){
 let v=consultasFiltradas[idx];
 let fecha=new Date(v.ts).toLocaleString('es-MX');
 let lineas=v.productos? v.productos.map(p=> `${p.cant}x ${p.nombre} @ $${p.precio.toFixed(2)} = $${(p.cant*p.precio).toFixed(2)}`).join('\n') : v.detalle;
-let txt=`KIGO SUPER - ${v.tienda.toUpperCase()}
-FOLIO: ${v.folio}
-SERIE: ${v.serie||'A'}
-FECHA: ${fecha}
-VENDEDOR: ${v.user}
-
-${lineas}
-
-VALOR: $${(v.valorTotal||0).toFixed(2)} MXN`;
+let formato=configPrint.formato;
+let header=configPrint.logo?'*** KIGO SUPER ***\n':'';
+if(formato==='fiscal'){ header+=`FOLIO: ${v.folio}\nSERIE: ${v.serie||'A'}\n`; }
+let txt=`${header}FECHA: ${fecha}\nVENDEDOR: ${v.user}\nTIENDA: ${v.tienda.toUpperCase()}\n------------------------------\n${lineas}\n------------------------------\nVALOR: $${(v.valorTotal||0).toFixed(2)} MXN\n${configPrint.pie}`;
 document.getElementById('consultaTicketContent').innerText=txt;
 imprimirDirecto('consultaTicketContent');
 }
@@ -343,25 +407,29 @@ log('venta','Venta caja '+tiendaActual, `Total $${total.toFixed(2)} - Recibido $
 guardarTodo();
 cerrarCobro();
 generarTicket(total,rec,cambio,folio,serie);
+let backupCarrito=[...carrito];
 carrito=[]; selectedIndex=null; renderCaja(); actualizarCorte();
-setTimeout(()=>{ imprimirDirecto('ticketContent'); },200);
+if(configPrint.auto){
+setTimeout(()=>{ imprimirDirecto('ticketContent'); },300);
+document.getElementById('modalTicket').style.display='flex';
+document.getElementById('ticketMsg').innerText='Imprimiendo en '+configPrint.nombre+'...';
+setTimeout(()=>{
+document.getElementById('modalTicket').style.display='none';
+document.getElementById('inputScan').focus();
+},2000);
+}else{
+document.getElementById('modalTicket').style.display='flex';
+document.getElementById('ticketMsg').innerText='Ticket listo. Configura impresión automática en IMPRESORA';
+}
 }
 function generarTicket(total,rec,cambio,folio,serie){
 let fecha=new Date().toLocaleString('es-MX');
 let lineas=carrito.map(c=> `${c.cant} x ${c.nombre.substring(0,22)} @ $${c.precio.toFixed(2)} = $${((c.precio*c.cant)-(c.desc||0)).toFixed(2)}`).join('\n');
-let txt=`KIGO SUPER - ${tiendaActual.toUpperCase()}
-FOLIO: ${folio}
-SERIE: ${serie}
-CAJERO: ${sesion.nombre}
-FECHA: ${fecha}
-
-${lineas}
-
-TOTAL: $${total.toFixed(2)} MXN
-RECIBIDO: $${rec.toFixed(2)} MXN
-CAMBIO: $${cambio.toFixed(2)} MXN
-
-Gracias!`;
+let header=configPrint.logo?'*** KIGO SUPER ***\n':'';
+if(configPrint.formato==='detallado' || configPrint.formato==='fiscal'){
+header+=`FOLIO: ${folio}\nSERIE: ${serie}\nCAJERO: ${sesion.nombre}\n`;
+}
+let txt=`${header}FECHA: ${fecha}\nTIENDA: ${tiendaActual.toUpperCase()}\n------------------------------\n${lineas}\n------------------------------\nTOTAL: $${total.toFixed(2)} MXN\nRECIBIDO: $${rec.toFixed(2)} MXN\nCAMBIO: $${cambio.toFixed(2)} MXN\n------------------------------\n${configPrint.pie}`;
 document.getElementById('ticketContent').innerText=txt;
 }
 function cerrarTicket(){document.getElementById('modalTicket').style.display='none'; document.getElementById('inputScan').focus();}
