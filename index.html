@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KIGO SUPER - POS con Peso</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<script src="https://unpkg.com/lucide@latest"></script>
+<style>
+:root{--black:#0a0a0a;--green:#16a34a;--red:#dc2626;--gray:#f2f3f5;--border:#e5e7eb}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
+body{background:var(--gray);padding:12px;padding-bottom:100px}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
+.top{height:56px;background:#0a0a0a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-radius:12px;margin-bottom:12px}
+.badge{padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800}
+.prod-btn{width:100%;height:64px;border:1.5px solid var(--border);border-radius:12px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;cursor:pointer;margin-bottom:8px}
+.prod-btn b{font-size:13px}.prod-btn small{color:#6b7280}
+.bascula{border:3px dashed #e5e7eb;border-radius:16px;padding:16px;text-align:center;transition:.3s}
+.bascula.ok{border-color:var(--green);background:#dcfce7}
+.bascula.error{border-color:var(--red);background:#fee2e2;animation:shake.3s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
+.peso-big{font-size:42px;font-weight:800;letter-spacing:-1px}
+.btn{width:100%;height:52px;border:none;border-radius:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.btn-black{background:var(--black);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.ticket{font-family:monospace;font-size:11px;line-height:1.4;background:#fff;border:1px dashed #000;padding:12px}
+</style>
+</head>
+<body>
+<div class="top"><b>KIGO SUPER</b><span style="font-size:10px;background:#25D366;padding:4px 8px;border-radius:20px">BASCULA CONECTADA</span></div>
+
+<div class="card">
+<div style="font-weight:800;margin-bottom:10px">1. ESCANEAR PRODUCTO</div>
+<button class="prod-btn" onclick="escanear('750123001')"><span style="font-size:24px">🥤</span><div style="text-align:left"><b>Gaseosa Manzana 400ml</b><br><small>Cod: 750123001 - Peso: 420g - $18</small></div></button>
+<button class="prod-btn" onclick="escanear('750123002')"><span style="font-size:24px">🥔</span><div style="text-align:left"><b>Papas Sabritas 45g</b><br><small>Cod: 750123002 - Peso: 50g - $20</small></div></button>
+<button class="prod-btn" onclick="escanear('750123003')"><span style="font-size:24px">🥤</span><div style="text-align:left"><b>Coca 600ml</b><br><small>Cod: 750123003 - Peso: 620g - $22</small></div></button>
+<div style="margin-top:10px"><input id="codigoManual" placeholder="O escribe código de barras y Enter" style="width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px" onkeydown="if(event.key==='Enter')escanear(this.value)"></div>
+</div>
+
+<div class="card">
+<div style="font-weight:800;margin-bottom:8px">2. VERIFICACIÓN POR PESO</div>
+<div id="boxBascula" class="bascula">
+<div id="msgBascula" style="font-size:12px;color:#6b7280">Esperando producto...</div>
+<div id="pesoActual" class="peso-big">0g</div>
+<div style="display:flex;gap:6px;margin-top:10px">
+<div style="flex:1;background:#f2f3f5;border-radius:8px;padding:6px"><small>Esperado</small><br><b id="pesoEsperado">- g</b></div>
+<div style="flex:1;background:#f2f3f5;border-radius:8px;padding:6px"><small>Tolerancia</small><br><b>±20g</b></div>
+</div>
+<div id="estadoPeso" style="margin-top:10px;font-weight:800"></div>
+</div>
+
+<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
+<button class="btn" style="background:#fff;border:1.5px solid var(--border)" onclick="simularPeso('bajo')">Simular 250g (vacío)</button>
+<button class="btn" style="background:#fff;border:1.5px solid var(--border)" onclick="simularPeso('ok')">Simular Peso OK</button>
+</div>
+<input id="pesoRealInput" type="number" placeholder="O escribe peso real de báscula (ej: 425)" style="width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;margin-top:8px" oninput="verificarPeso(this.value)">
+                               </div>
+                               <div class="card">
+<div style="display:flex;justify-content:space-between"><div style="font-weight:800">3. TICKET</div><span id="totalItems" class="badge" style="background:#0a0a0a;color:#fff">0 productos</span></div>
+<div id="listaTicket" style="margin-top:10px"></div>
+<div style="border-top:2px solid #0a0a0a;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:800;font-size:16px"><span>TOTAL</span><span id="totalVenta">$0</span></div>
+<button id="btnCobrar" class="btn btn-black" style="margin-top:12px;opacity:.4" disabled onclick="cobrar()"><i data-lucide="printer"></i> COBRAR E IMPRIMIR TIRILLA</button>
+</div>
+
+<div class="card" id="cardTirilla" style="display:none">
+<div style="font-weight:800;margin-bottom:8px">TIRILLA - FACTURA</div>
+<div id="tirilla" class="ticket"></div>
+<button class="btn btn-green" style="margin-top:10px" onclick="nuevaVenta()">Nueva venta</button>
+</div>
+
+<script>
+let productos={
+'750123001':{nombre:'Gaseosa Manzana 400ml',peso:420,precio:18,stock:100},
+'750123002':{nombre:'Papas Sabritas 45g',peso:50,precio:20,stock:80},
+'750123003':{nombre:'Coca 600ml',peso:620,precio:22,stock:60}
+};
+let productoActual=null;
+let carrito=[];
+let pesoActual=0;
+
+function escanear(codigo){
+let p=productos[codigo];
+if(!p){alert('Producto no encontrado');return;}
+productoActual=p;
+document.getElementById('pesoEsperado').innerText=p.peso+'g';
+document.getElementById('msgBascula').innerText='Producto: '+p.nombre+' - Coloque en báscula';
+document.getElementById('boxBascula').className='bascula';
+document.getElementById('estadoPeso').innerText='';
+document.getElementById('pesoActual').innerText='---';
+document.getElementById('pesoRealInput').value='';
+document.getElementById('pesoRealInput').focus();
+}
+
+function simularPeso(tipo){
+if(!productoActual)return alert('Primero escanea producto');
+let peso=0;
+if(tipo==='bajo') peso=productoActual.peso-150;
+if(tipo==='ok') peso=productoActual.peso + (Math.random()*10-5);
+verificarPeso(peso.toFixed(0));
+document.getElementById('pesoRealInput').value=peso.toFixed(0);
+}
+
+function verificarPeso(peso){
+if(!productoActual)return;
+pesoActual=parseInt(peso)||0;
+document.getElementById('pesoActual').innerText=pesoActual+'g';
+let esperado=productoActual.peso;
+let tolerancia=20;
+let diff=Math.abs(pesoActual-esperado);
+let box=document.getElementById('boxBascula');
+let estado=document.getElementById('estadoPeso');
+
+if(pesoActual===0){
+box.className='bascula';
+estado.innerText='';
+return;
+}
+
+if(diff<=tolerancia){
+box.className='bascula ok';
+estado.innerHTML='<span style="color:#16a34a">✓ PESO CORRECTO - Producto verificado</span><br><button class="btn btn-green" style="margin-top:8px;height:40px" onclick="agregarAlTicket()">Agregar al ticket</button>';
+// sonido beep ok
+}else{
+box.className='bascula error';
+if(pesoActual<esperado){
+estado.innerHTML='<span style="color:#dc2626">✗ PESO BAJO - Posible producto vacío o incompleto. BLOQUEADO</span>';
+}else{
+estado.innerHTML='<span style="color:#dc2626">✗ PESO ALTO - Producto incorrecto. BLOQUEADO</span>';
+}
+}
+}
+
+function agregarAlTicket(){
+if(!productoActual)return;
+carrito.push({...productoActual,pesoReal:pesoActual,ts:Date.now()});
+productoActual.stock--;
+renderTicket();
+productoActual=null;
+document.getElementById('boxBascula').className='bascula';
+document.getElementById('msgBascula').innerText='Esperando producto...';
+document.getElementById('pesoActual').innerText='0g';
+document.getElementById('pesoEsperado').innerText='- g';
+document.getElementById('estadoPeso').innerText='';
+document.getElementById('pesoRealInput').value='';
+}
+
+function renderTicket(){
+let html='';
+let total=0;
+carrito.forEach((item,i)=>{
+total+=item.precio;
+html+=`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f4f6"><span><b>${item.nombre}</b><br><small>${item.peso}g verificado ${item.pesoReal}g</small></span><span>$${item.precio}</span></div>`;
+});
+document.getElementById('listaTicket').innerHTML=html||'<small style="color:#6b7280">Sin productos</small>';
+document.getElementById('totalVenta').innerText='$'+total;
+document.getElementById('totalItems').innerText=carrito.length+' productos';
+let btn=document.getElementById('btnCobrar');
+btn.disabled=carrito.length===0;
+btn.style.opacity=carrito.length===0?.4:1;
+lucide.createIcons();
+}
+
+function cobrar(){
+let total=carrito.reduce((a,b)=>a+b.precio,0);
+let fecha=new Date().toLocaleString('es-MX');
+let tirilla=`KIGO SUPER<br>Dolores Hidalgo, Gto.<br>${fecha}<br>--------------------------<br>`;
+carrito.forEach(i=>{tirilla+=`${i.nombre}<br>${i.peso}g OK (${i.pesoReal}g) $${i.precio}<br>`});
+tirilla+=`--------------------------<br>TOTAL: $${total}<br>EFECTIVO<br>¡Gracias por su compra!<br><br>Productos verificados por peso`;
+document.getElementById('tirilla').innerHTML=tirilla;
+document.getElementById('cardTirilla').style.display='block';
+document.getElementById('cardTirilla').scrollIntoView({behavior:'smooth'});
+// Aqui se manda a impresora térmica: window.print() o ESC/POS
+}
+
+function nuevaVenta(){
+carrito=[];
+productoActual=null;
+renderTicket();
+document.getElementById('cardTirilla').style.display='none';
+window.scrollTo({top:0,behavior:'smooth'});
+}
+renderTicket();
+lucide.createIcons();
+</script>
+</body>
+</html>
