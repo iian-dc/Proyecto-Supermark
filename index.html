@@ -2,183 +2,209 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KIGO SUPER - POS con Peso</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;800&display=swap" rel="stylesheet">
+<title>KIGO SUPER - Inventario 3 Tiendas</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
-:root{--black:#0a0a0a;--green:#16a34a;--red:#dc2626;--gray:#f2f3f5;--border:#e5e7eb}
-*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif}
-body{background:var(--gray);padding:12px;padding-bottom:100px}
-.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px;margin-bottom:10px}
-.top{height:56px;background:#0a0a0a;color:#fff;display:flex;align-items:center;justify-content:space-between;padding:0 16px;border-radius:12px;margin-bottom:12px}
-.badge{padding:4px 8px;border-radius:20px;font-size:10px;font-weight:800}
-.prod-btn{width:100%;height:64px;border:1.5px solid var(--border);border-radius:12px;background:#fff;display:flex;align-items:center;gap:10px;padding:0 12px;cursor:pointer;margin-bottom:8px}
-.prod-btn b{font-size:13px}.prod-btn small{color:#6b7280}
-.bascula{border:3px dashed #e5e7eb;border-radius:16px;padding:16px;text-align:center;transition:.3s}
-.bascula.ok{border-color:var(--green);background:#dcfce7}
-.bascula.error{border-color:var(--red);background:#fee2e2;animation:shake.3s}
-@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
-.peso-big{font-size:42px;font-weight:800;letter-spacing:-1px}
-.btn{width:100%;height:52px;border:none;border-radius:12px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+:root{--blue:#0ea5e9;--blue2:#e0f2fe;--blue3:#0284c7;--black:#0a0a0a;--gray:#f8fafc;--border:#e2e8f0;--red:#dc2626;--green:#16a34a}
+*{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;color:var(--black)}
+body{background:var(--gray)}
+.header{height:60px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:10}
+.header b{font-size:18px;letter-spacing:-.5px}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:9}
+.tab{height:38px;padding:0 18px;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:6px}
+.tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
+.tab.active i,.tab.active svg{color:#fff;stroke:#fff}
+.container{max-width:1200px;margin:0 auto;padding:16px}
+.grid{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; margin-bottom:16px}
+@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px}
+.card-top{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.kpi{font-size:28px;font-weight:800;letter-spacing:-1px}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
+.input{height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:14px;background:#fff;width:100%}
+.input:focus{outline:none;border-color:var(--blue)}
+.table-wrap{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+table{width:100%;border-collapse:collapse}
+th{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#64748b;text-align:left;padding:10px 16px;background:#f8fafc;border-bottom:1px solid var(--border)}
+td{padding:12px 16px;border-bottom:1px solid var(--border);font-size:13px}
+.badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
+.badge-blue{background:var(--blue2);color:var(--blue3)}
+.badge-red{background:#fee2e2;color:var(--red)}
+.badge-green{background:#dcfce7;color:var(--green)}
+.stock{font-weight:800}
+.btn{height:44px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 16px}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-white{background:#fff;border:1.5px solid var(--border)}
 .btn-black{background:var(--black);color:#fff}
-.btn-green{background:var(--green);color:#fff}
-.ticket{font-family:monospace;font-size:11px;line-height:1.4;background:#fff;border:1px dashed #000;padding:12px}
+.btn-black i{color:#fff}
+.mobile-card{display:none}
+@media(max-width:768px){
+table{display:none}
+.mobile-card{display:block}
+.mobile-item{padding:14px 16px;border-bottom:1px solid var(--border)}
+}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow:auto}
+.modal-head{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr}}
+.form-group{display:flex;flex-direction:column;gap:6px}
+.form-group label{font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b}
 </style>
 </head>
 <body>
-<div class="top"><b>KIGO SUPER</b><span style="font-size:10px;background:#25D366;padding:4px 8px;border-radius:20px">BASCULA CONECTADA</span></div>
-
-<div class="card">
-<div style="font-weight:800;margin-bottom:10px">1. ESCANEAR PRODUCTO</div>
-<button class="prod-btn" onclick="escanear('750123001')"><span style="font-size:24px">🥤</span><div style="text-align:left"><b>Gaseosa Manzana 400ml</b><br><small>Cod: 750123001 - Peso: 420g - $18</small></div></button>
-<button class="prod-btn" onclick="escanear('750123002')"><span style="font-size:24px">🥔</span><div style="text-align:left"><b>Papas Sabritas 45g</b><br><small>Cod: 750123002 - Peso: 50g - $20</small></div></button>
-<button class="prod-btn" onclick="escanear('750123003')"><span style="font-size:24px">🥤</span><div style="text-align:left"><b>Coca 600ml</b><br><small>Cod: 750123003 - Peso: 620g - $22</small></div></button>
-<div style="margin-top:10px"><input id="codigoManual" placeholder="O escribe código de barras y Enter" style="width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px" onkeydown="if(event.key==='Enter')escanear(this.value)"></div>
+<div class="header">
+<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="store" style="color:#fff;width:20px"></i></div><b>KIGO SUPER</b></div>
+<button class="btn btn-blue" onclick="abrirModal()"><i data-lucide="plus" style="width:16px;color:#fff"></i> Registrar producto</button>
 </div>
 
-<div class="card">
-<div style="font-weight:800;margin-bottom:8px">2. VERIFICACIÓN POR PESO</div>
-<div id="boxBascula" class="bascula">
-<div id="msgBascula" style="font-size:12px;color:#6b7280">Esperando producto...</div>
-<div id="pesoActual" class="peso-big">0g</div>
-<div style="display:flex;gap:6px;margin-top:10px">
-<div style="flex:1;background:#f2f3f5;border-radius:8px;padding:6px"><small>Esperado</small><br><b id="pesoEsperado">- g</b></div>
-<div style="flex:1;background:#f2f3f5;border-radius:8px;padding:6px"><small>Tolerancia</small><br><b>±20g</b></div>
-</div>
-<div id="estadoPeso" style="margin-top:10px;font-weight:800"></div>
+<div class="tabs">
+<button class="tab active" data-tienda="todas" onclick="cambiarTienda('todas')"><i data-lucide="layout-grid" style="width:16px"></i> Todas</button>
+<button class="tab" data-tienda="estacion" onclick="cambiarTienda('estacion')"><i data-lucide="map-pin" style="width:16px"></i> La Estación</button>
+<button class="tab" data-tienda="turbina" onclick="cambiarTienda('turbina')"><i data-lucide="map-pin" style="width:16px"></i> La Turbina</button>
+<button class="tab" data-tienda="santafe" onclick="cambiarTienda('santafe')"><i data-lucide="map-pin" style="width:16px"></i> Santa Fe</button>
 </div>
 
-<div style="margin-top:12px;display:grid;grid-template-columns:1fr 1fr;gap:8px">
-<button class="btn" style="background:#fff;border:1.5px solid var(--border)" onclick="simularPeso('bajo')">Simular 250g (vacío)</button>
-<button class="btn" style="background:#fff;border:1.5px solid var(--border)" onclick="simularPeso('ok')">Simular Peso OK</button>
-</div>
-<input id="pesoRealInput" type="number" placeholder="O escribe peso real de báscula (ej: 425)" style="width:100%;height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;margin-top:8px" oninput="verificarPeso(this.value)">
-                               </div>
-                               <div class="card">
-<div style="display:flex;justify-content:space-between"><div style="font-weight:800">3. TICKET</div><span id="totalItems" class="badge" style="background:#0a0a0a;color:#fff">0 productos</span></div>
-<div id="listaTicket" style="margin-top:10px"></div>
-<div style="border-top:2px solid #0a0a0a;margin-top:10px;padding-top:10px;display:flex;justify-content:space-between;font-weight:800;font-size:16px"><span>TOTAL</span><span id="totalVenta">$0</span></div>
-<button id="btnCobrar" class="btn btn-black" style="margin-top:12px;opacity:.4" disabled onclick="cobrar()"><i data-lucide="printer"></i> COBRAR E IMPRIMIR TIRILLA</button>
+<div class="container">
+<div class="grid">
+<div class="card"><div class="card-top"><span style="font-size:11px;font-weight:700;color:#64748b">TOTAL PRODUCTOS</span><i data-lucide="package" style="width:16px"></i></div><div class="kpi" id="kpiTotal">0</div><small style="color:#64748b">Activos en inventario</small></div>
+<div class="card"><div class="card-top"><span style="font-size:11px;font-weight:700;color:#64748b">STOCK BAJO</span><i data-lucide="alert-triangle" style="width:16px;color:#dc2626"></i></div><div class="kpi" id="kpiBajo">0</div><small style="color:#dc2626">Requieren compra</small></div>
+<div class="card"><div class="card-top"><span style="font-size:11px;font-weight:700;color:#64748b">VALOR INVENTARIO</span><i data-lucide="dollar-sign" style="width:16px"></i></div><div class="kpi" id="kpiValor">$0</div><small style="color:#64748b">Costo total</small></div>
 </div>
 
-<div class="card" id="cardTirilla" style="display:none">
-<div style="font-weight:800;margin-bottom:8px">TIRILLA - FACTURA</div>
-<div id="tirilla" class="ticket"></div>
-<button class="btn btn-green" style="margin-top:10px" onclick="nuevaVenta()">Nueva venta</button>
+<div class="toolbar">
+<div style="flex:1;min-width:200px;position:relative"><i data-lucide="search" style="position:absolute;left:12px;top:13px;width:18px;color:#94a3b8"></i><input id="buscador" class="input" style="padding-left:38px" placeholder="Buscar por nombre o código de barras" oninput="render()"></div>
+<select id="filtroCat" class="input" style="width:160px" onchange="render()"><option value="todas">Todas categorías</option><option value="gaseosa">Gaseosas</option><option value="botana">Botanas</option><option value="abarrotes">Abarrotes</option></select>
+</div>
+
+<div class="table-wrap">
+<div class="table-head"><div style="display:flex;align-items:center;gap:8px"><i data-lucide="boxes" style="width:18px"></i><b>Inventario completo</b></div><span id="contador" class="badge badge-blue">0 productos</span></div>
+<table><thead><tr><th>Producto</th><th>Código</th><th>La Estación</th><th>La Turbina</th><th>Santa Fe</th><th>Total</th><th>Estado</th></tr></thead><tbody id="tbody"></tbody></table>
+<div id="mobileList" class="mobile-card"></div>
+</div>
+</div>
+<div id="modal" class="modal-bg">
+<div class="modal">
+<div class="modal-head"><div style="display:flex;align-items:center;gap:8px"><i data-lucide="plus-circle" style="width:20px"></i><b>Registrar nuevo producto</b></div><button class="btn btn-white" style="width:36px;height:36px;padding:0" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div style="padding:16px">
+<div class="form-grid">
+<div class="form-group" style="grid-column:1 / -1"><label>Nombre del producto</label><input id="fNombre" class="input" placeholder="Ej: Gaseosa Manzana 400ml"></div>
+<div class="form-group"><label>Código de barras</label><input id="fCodigo" class="input" placeholder="750..."></div>
+<div class="form-group"><label>Categoría</label><select id="fCat" class="input"><option value="gaseosa">Gaseosa</option><option value="botana">Botana</option><option value="abarrotes">Abarrotes</option></select></div>
+<div class="form-group"><label>Peso esperado (g)</label><input id="fPeso" type="number" class="input" placeholder="420"></div>
+<div class="form-group"><label>Precio compra</label><input id="fCompra" type="number" class="input" placeholder="10"></div>
+<div class="form-group"><label>Precio venta</label><input id="fVenta" type="number" class="input" placeholder="18"></div>
+<div class="form-group" style="grid-column:1 / -1"><label style="color:var(--blue3)">Stock por tienda</label></div>
+<div class="form-group"><label>La Estación</label><input id="fEstacion" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>La Turbina</label><input id="fTurbina" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>Santa Fe</label><input id="fSantafe" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>Stock mínimo alerta</label><input id="fMin" type="number" class="input" placeholder="5"></div>
+</div>
+<div style="display:flex;gap:8px;margin-top:16px">
+<button class="btn btn-white" style="flex:1" onclick="cerrarModal()">Cancelar</button>
+<button class="btn btn-blue" style="flex:1" onclick="guardarProducto()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar producto</button>
+</div>
+</div>
+</div>
 </div>
 
 <script>
-let productos={
-'750123001':{nombre:'Gaseosa Manzana 400ml',peso:420,precio:18,stock:100},
-'750123002':{nombre:'Papas Sabritas 45g',peso:50,precio:20,stock:80},
-'750123003':{nombre:'Coca 600ml',peso:620,precio:22,stock:60}
-};
-let productoActual=null;
-let carrito=[];
-let pesoActual=0;
+let tiendaActual='todas';
+let productos=[
+{ id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, compra:10, venta:18, stock:{estacion:25,turbina:12,santafe:18}, min:5 },
+{ id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, compra:12, venta:20, stock:{estacion:40,turbina:30,santafe:15}, min:10 },
+{ id:3, nombre:'Coca 600ml', codigo:'750123003', cat:'gaseosa', peso:620, compra:14, venta:22, stock:{estacion:8,turbina:3,santafe:20}, min:8 },
+];
 
-function escanear(codigo){
-let p=productos[codigo];
-if(!p){alert('Producto no encontrado');return;}
-productoActual=p;
-document.getElementById('pesoEsperado').innerText=p.peso+'g';
-document.getElementById('msgBascula').innerText='Producto: '+p.nombre+' - Coloque en báscula';
-document.getElementById('boxBascula').className='bascula';
-document.getElementById('estadoPeso').innerText='';
-document.getElementById('pesoActual').innerText='---';
-document.getElementById('pesoRealInput').value='';
-document.getElementById('pesoRealInput').focus();
+function cambiarTienda(t){
+tiendaActual=t;
+document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tienda===t));
+render();
 }
 
-function simularPeso(tipo){
-if(!productoActual)return alert('Primero escanea producto');
-let peso=0;
-if(tipo==='bajo') peso=productoActual.peso-150;
-if(tipo==='ok') peso=productoActual.peso + (Math.random()*10-5);
-verificarPeso(peso.toFixed(0));
-document.getElementById('pesoRealInput').value=peso.toFixed(0);
-}
-
-function verificarPeso(peso){
-if(!productoActual)return;
-pesoActual=parseInt(peso)||0;
-document.getElementById('pesoActual').innerText=pesoActual+'g';
-let esperado=productoActual.peso;
-let tolerancia=20;
-let diff=Math.abs(pesoActual-esperado);
-let box=document.getElementById('boxBascula');
-let estado=document.getElementById('estadoPeso');
-
-if(pesoActual===0){
-box.className='bascula';
-estado.innerText='';
-return;
-}
-
-if(diff<=tolerancia){
-box.className='bascula ok';
-estado.innerHTML='<span style="color:#16a34a">✓ PESO CORRECTO - Producto verificado</span><br><button class="btn btn-green" style="margin-top:8px;height:40px" onclick="agregarAlTicket()">Agregar al ticket</button>';
-// sonido beep ok
-}else{
-box.className='bascula error';
-if(pesoActual<esperado){
-estado.innerHTML='<span style="color:#dc2626">✗ PESO BAJO - Posible producto vacío o incompleto. BLOQUEADO</span>';
-}else{
-estado.innerHTML='<span style="color:#dc2626">✗ PESO ALTO - Producto incorrecto. BLOQUEADO</span>';
-}
-}
-}
-
-function agregarAlTicket(){
-if(!productoActual)return;
-carrito.push({...productoActual,pesoReal:pesoActual,ts:Date.now()});
-productoActual.stock--;
-renderTicket();
-productoActual=null;
-document.getElementById('boxBascula').className='bascula';
-document.getElementById('msgBascula').innerText='Esperando producto...';
-document.getElementById('pesoActual').innerText='0g';
-document.getElementById('pesoEsperado').innerText='- g';
-document.getElementById('estadoPeso').innerText='';
-document.getElementById('pesoRealInput').value='';
-}
-
-function renderTicket(){
-let html='';
-let total=0;
-carrito.forEach((item,i)=>{
-total+=item.precio;
-html+=`<div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #f3f4f6"><span><b>${item.nombre}</b><br><small>${item.peso}g verificado ${item.pesoReal}g</small></span><span>$${item.precio}</span></div>`;
+function render(){
+let q=document.getElementById('buscador').value.toLowerCase();
+let cat=document.getElementById('filtroCat').value;
+let filtrados=productos.filter(p=>{
+let matchQ=p.nombre.toLowerCase().includes(q)||p.codigo.includes(q);
+let matchCat=cat==='todas'||p.cat===cat;
+let matchTienda=true;
+if(tiendaActual!=='todas'){ matchTienda=p.stock[tiendaActual]>0 || true; }
+return matchQ&&matchCat&&matchTienda;
 });
-document.getElementById('listaTicket').innerHTML=html||'<small style="color:#6b7280">Sin productos</small>';
-document.getElementById('totalVenta').innerText='$'+total;
-document.getElementById('totalItems').innerText=carrito.length+' productos';
-let btn=document.getElementById('btnCobrar');
-btn.disabled=carrito.length===0;
-btn.style.opacity=carrito.length===0?.4:1;
+
+let tbody=document.getElementById('tbody');
+let mobile=document.getElementById('mobileList');
+tbody.innerHTML=''; mobile.innerHTML='';
+
+filtrados.forEach(p=>{
+let total=p.stock.estacion+p.stock.turbina+p.stock.santafe;
+let bajo=total<=p.min;
+let row=`
+<tr>
+<td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;background:var(--blue2);border-radius:8px;display:flex;align-items:center;justify-content:center"><i data-lucide="package" style="width:16px;color:var(--blue3)"></i></div><div><b>${p.nombre}</b><br><small style="color:#64748b">${p.peso}g - $${p.venta}</small></div></div></td>
+<td><small>${p.codigo}</small></td>
+<td class="stock">${p.stock.estacion}</td>
+<td class="stock">${p.stock.turbina}</td>
+<td class="stock">${p.stock.santafe}</td>
+<td class="stock">${total}</td>
+<td><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></td>
+</tr>`;
+tbody.innerHTML+=row;
+
+let m=`
+<div class="mobile-item">
+<div style="display:flex;justify-content:space-between"><b>${p.nombre}</b><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></div>
+<small style="color:#64748b">${p.codigo} - ${p.peso}g</small>
+<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px">
+<div style="background:var(--gray);border-radius:8px;padding:8px;text-align:center"><small>Estación</small><br><b>${p.stock.estacion}</b></div>
+<div style="background:var(--gray);border-radius:8px;padding:8px;text-align:center"><small>Turbina</small><br><b>${p.stock.turbina}</b></div>
+<div style="background:var(--gray);border-radius:8px;padding:8px;text-align:center"><small>Santa Fe</small><br><b>${p.stock.santafe}</b></div>
+</div>
+<div style="margin-top:6px;font-size:12px">Total: <b>${total}</b> - Precio: $${p.venta}</div>
+</div>`;
+mobile.innerHTML+=m;
+});
+
+document.getElementById('contador').innerText=filtrados.length+' productos';
+document.getElementById('kpiTotal').innerText=productos.length;
+document.getElementById('kpiBajo').innerText=productos.filter(p=> (p.stock.estacion+p.stock.turbina+p.stock.santafe)<=p.min ).length;
+let valor=productos.reduce((a,p)=>a+ ((p.stock.estacion+p.stock.turbina+p.stock.santafe)*p.compra),0);
+document.getElementById('kpiValor').innerText='$'+valor.toLocaleString('es-MX');
 lucide.createIcons();
 }
 
-function cobrar(){
-let total=carrito.reduce((a,b)=>a+b.precio,0);
-let fecha=new Date().toLocaleString('es-MX');
-let tirilla=`KIGO SUPER<br>Dolores Hidalgo, Gto.<br>${fecha}<br>--------------------------<br>`;
-carrito.forEach(i=>{tirilla+=`${i.nombre}<br>${i.peso}g OK (${i.pesoReal}g) $${i.precio}<br>`});
-tirilla+=`--------------------------<br>TOTAL: $${total}<br>EFECTIVO<br>¡Gracias por su compra!<br><br>Productos verificados por peso`;
-document.getElementById('tirilla').innerHTML=tirilla;
-document.getElementById('cardTirilla').style.display='block';
-document.getElementById('cardTirilla').scrollIntoView({behavior:'smooth'});
-// Aqui se manda a impresora térmica: window.print() o ESC/POS
+function abrirModal(){document.getElementById('modal').style.display='flex';}
+function cerrarModal(){document.getElementById('modal').style.display='none';}
+
+function guardarProducto(){
+let n=document.getElementById('fNombre').value;
+let c=document.getElementById('fCodigo').value;
+if(!n||!c){alert('Nombre y código son obligatorios');return;}
+let nuevo={
+id:Date.now(),
+nombre:n,
+codigo:c,
+cat:document.getElementById('fCat').value,
+peso:parseInt(document.getElementById('fPeso').value)||0,
+compra:parseFloat(document.getElementById('fCompra').value)||0,
+venta:parseFloat(document.getElementById('fVenta').value)||0,
+stock:{
+estacion:parseInt(document.getElementById('fEstacion').value)||0,
+turbina:parseInt(document.getElementById('fTurbina').value)||0,
+santafe:parseInt(document.getElementById('fSantafe').value)||0,
+},
+min:parseInt(document.getElementById('fMin').value)||5
+};
+productos.unshift(nuevo);
+cerrarModal();
+document.getElementById('fNombre').value='';document.getElementById('fCodigo').value='';
+render();
 }
 
-function nuevaVenta(){
-carrito=[];
-productoActual=null;
-renderTicket();
-document.getElementById('cardTirilla').style.display='none';
-window.scrollTo({top:0,behavior:'smooth'});
-}
-renderTicket();
+render();
 lucide.createIcons();
 </script>
 </body>
