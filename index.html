@@ -2,139 +2,199 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KIGO SUPER - Inventario 3 Tiendas</title>
+<title>KIGO SUPER - Inventario Pro</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;800&display=swap" rel="stylesheet">
 <script src="https://unpkg.com/lucide@latest"></script>
 <style>
-:root{--blue:#38bdf8;--blue2:#e0f2fe;--blue-dark:#0284c7;--black:#0a0a0a;--gray:#f8fafc;--border:#e2e8f0;--red:#dc2626;--green:#16a34a}
+:root{--blue:#38bdf8;--blue2:#e0f2fe;--blue-dark:#0284c7;--black:#0a0a0a;--gray:#f8fafc;--border:#e2e8f0;--red:#dc2626;--green:#16a34a;--orange:#f59e0b}
 *{margin:0;padding:0;box-sizing:border-box;font-family:Inter,sans-serif;color:var(--black)}
-body{background:var(--gray)}
-.header{height:60px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:10}
-.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:9}
+body{background:var(--gray);padding-bottom:90px}
+.header{height:60px;background:#fff;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 16px;position:sticky;top:0;z-index:20}
+.tabs{display:flex;gap:8px;overflow-x:auto;padding:12px 16px;background:#fff;border-bottom:1px solid var(--border);position:sticky;top:60px;z-index:19}
 .tab{height:38px;padding:0 18px;border-radius:999px;border:1.5px solid var(--border);background:#fff;font-weight:700;font-size:13px;white-space:nowrap;cursor:pointer;display:flex;align-items:center;gap:6px}
 .tab.active{background:var(--blue);border-color:var(--blue);color:#fff}
 .tab.active svg{stroke:#fff}
 .container{max-width:1200px;margin:0 auto;padding:16px}
-.grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:16px}
-@media(max-width:768px){.grid{grid-template-columns:1fr}}
+.grid{display:grid;grid-template-columns:1fr 1fr 1fr 1fr;gap:12px;margin-bottom:16px}
+@media(max-width:900px){.grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.grid{grid-template-columns:1fr}}
 .card{background:#fff;border:1px solid var(--border);border-radius:16px;padding:16px}
-.kpi{font-size:28px;font-weight:800}
+.kpi{font-size:26px;font-weight:800;letter-spacing:-.5px}
 .toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}
 .input{height:44px;border:1.5px solid var(--border);border-radius:10px;padding:0 12px;font-size:14px;width:100%;background:#fff}
+.input:focus{outline:none;border-color:var(--blue)}
+.actions{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.actions::-webkit-scrollbar{display:none}
+.btn{height:42px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px;white-space:nowrap}
+.btn-blue{background:var(--blue);color:#fff}
+.btn-white{background:#fff;border:1.5px solid var(--border)}
+.btn-black{background:var(--black);color:#fff}
+.btn-green{background:var(--green);color:#fff}
+.btn-orange{background:var(--orange);color:#fff}
 .table-wrap{background:#fff;border:1px solid var(--border);border-radius:16px;overflow:hidden}
-.table-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border)}
+.table-head{display:flex;justify-content:space-between;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);flex-wrap:wrap;gap:8px}
 table{width:100%;border-collapse:collapse}
-th{font-size:11px;text-transform:uppercase;color:#64748b;text-align:left;padding:10px 12px;background:#f8fafc;border-bottom:1px solid var(--border)}
-td{padding:12px 12px;border-bottom:1px solid var(--border);font-size:13px}
+th{font-size:10px;text-transform:uppercase;color:#64748b;text-align:left;padding:10px 10px;background:#f8fafc;border-bottom:1px solid var(--border);letter-spacing:.4px}
+td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 .badge{padding:4px 8px;border-radius:999px;font-size:11px;font-weight:700}
 .badge-blue{background:var(--blue2);color:var(--blue-dark)}
 .badge-red{background:#fee2e2;color:var(--red)}
 .badge-green{background:#dcfce7;color:var(--green)}
-.btn{height:40px;border:none;border-radius:10px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px;padding:0 14px}
-.btn-blue{background:var(--blue);color:#fff}
-.btn-icon{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.badge-orange{background:#fef3c7;color:#d97706}
+.btn-icon{width:34px;height:34px;border-radius:8px;border:1.5px solid var(--border);background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .mobile-list{display:none}
-@media(max-width:850px){table{display:none}.mobile-list{display:block}}
-.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.4);display:none;align-items:center;justify-content:center;z-index:20;padding:16px}
-.modal{background:#fff;border-radius:20px;width:100%;max-width:560px;max-height:90vh;overflow:auto}
-.modal-head{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff}
+@media(max-width:900px){table{display:none}.mobile-list{display:block}}
+.modal-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:center;justify-content:center;z-index:50;padding:16px;backdrop-filter:blur(4px)}
+.modal{background:#fff;border-radius:20px;width:100%;max-width:580px;max-height:92vh;overflow:auto}
+.modal-head{padding:16px;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;background:#fff;z-index:1}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 @media(max-width:600px){.form-grid{grid-template-columns:1fr}}
 .form-group{display:flex;flex-direction:column;gap:6px}
 .form-group label{font-size:11px;font-weight:700;text-transform:uppercase;color:#64748b}
+.log-item{padding:10px 14px;border-bottom:1px solid var(--border);display:flex;gap:10px;font-size:12px}
 </style>
 </head>
 <body>
 <div class="header">
-<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="store" style="color:#fff;width:20px"></i></div><b>KIGO SUPER</b><span style="font-size:10px;background:var(--blue2);color:var(--blue-dark);padding:4px 8px;border-radius:999px;font-weight:700;margin-left:8px" id="labelTienda">TODAS</span></div>
-<button class="btn btn-blue" onclick="abrirModal()"><i data-lucide="plus" style="width:16px;color:#fff"></i> Registrar</button>
+<div style="display:flex;align-items:center;gap:10px"><div style="width:36px;height:36px;background:var(--blue);border-radius:10px;display:flex;align-items:center;justify-content:center"><i data-lucide="store" style="color:#fff;width:20px"></i></div><b>KIGO SUPER</b><span style="font-size:10px;background:var(--blue2);color:var(--blue-dark);padding:4px 8px;border-radius:999px;font-weight:700" id="labelTienda">TODAS</span></div>
+<button class="btn btn-blue" onclick="abrirModal()"><i data-lucide="plus" style="width:16px;color:#fff"></i> Producto</button>
 </div>
+
 <div class="tabs">
 <button class="tab active" data-tienda="todas" onclick="cambiarTienda('todas')"><i data-lucide="layout-grid" style="width:16px"></i> Todas</button>
-<button class="tab" data-tienda="estacion" onclick="cambiarTienda('estacion')"><i data-lucide="map-pin" style="width:16px"></i> La Estación</button>
-<button class="tab" data-tienda="turbina" onclick="cambiarTienda('turbina')"><i data-lucide="map-pin" style="width:16px"></i> La Turbina</button>
+<button class="tab" data-tienda="estacion" onclick="cambiarTienda('estacion')"><i data-lucide="map-pin" style="width:16px"></i> Estación</button>
+<button class="tab" data-tienda="turbina" onclick="cambiarTienda('turbina')"><i data-lucide="map-pin" style="width:16px"></i> Turbina</button>
 <button class="tab" data-tienda="santafe" onclick="cambiarTienda('santafe')"><i data-lucide="map-pin" style="width:16px"></i> Santa Fe</button>
 </div>
+
 <div class="container">
 <div class="grid">
-<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;font-weight:700;color:#64748b">PRODUCTOS EN TIENDA</span><i data-lucide="package" style="width:16px"></i></div><div class="kpi" id="kpiTotal">0</div><small id="kpiSub" style="color:#64748b">En esta vista</small></div>
-<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;font-weight:700;color:#64748b">STOCK BAJO</span><i data-lucide="alert-triangle" style="width:16px;color:#dc2626"></i></div><div class="kpi" id="kpiBajo">0</div><small style="color:#dc2626">Requieren compra</small></div>
-<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:11px;font-weight:700;color:#64748b">VALOR</span><i data-lucide="dollar-sign" style="width:16px"></i></div><div class="kpi" id="kpiValor">$0</div><small style="color:#64748b">Costo en esta tienda</small></div>
+<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#64748b">EN VISTA</span><i data-lucide="package" style="width:16px"></i></div><div class="kpi" id="kpiTotal">0</div><small id="kpiSub" style="color:#64748b">productos</small></div>
+<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#64748b">STOCK BAJO</span><i data-lucide="alert-triangle" style="width:16px;color:var(--red)"></i></div><div class="kpi" id="kpiBajo">0</div><small style="color:var(--red)" id="kpiBajoTxt">por comprar</small></div>
+<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#64748b">POR CADUCAR</span><i data-lucide="calendar" style="width:16px;color:var(--orange)"></i></div><div class="kpi" id="kpiCad">0</div><small style="color:var(--orange)">en 7 días</small></div>
+<div class="card"><div style="display:flex;justify-content:space-between"><span style="font-size:10px;font-weight:700;color:#64748b">VALOR TIENDA</span><i data-lucide="dollar-sign" style="width:16px"></i></div><div class="kpi" id="kpiValor">$0</div><small style="color:#64748b" id="kpiValorSub">costo</small></div>
 </div>
-<div class="toolbar">
-<div style="flex:1;min-width:200px;position:relative"><i data-lucide="search" style="position:absolute;left:12px;top:13px;width:18px;color:#94a3b8"></i><input id="buscador" class="input" style="padding-left:38px" placeholder="Buscar por nombre o código" oninput="render()"></div>
-<select id="filtroCat" class="input" style="width:160px" onchange="render()"><option value="todas">Todas categorías</option><option value="gaseosa">Gaseosas</option><option value="botana">Botanas</option><option value="abarrotes">Abarrotes</option></select>
+
+<div class="actions">
+<button class="btn btn-white" onclick="abrirTraspaso()"><i data-lucide="arrow-left-right" style="width:16px"></i> Traspaso entre tiendas</button>
+<button class="btn btn-white" onclick="abrirCompra()"><i data-lucide="truck" style="width:16px"></i> Entrada por compra</button>
+<button class="btn btn-white" onclick="abrirConteo()"><i data-lucide="clipboard-check" style="width:16px"></i> Conteo físico</button>
+<button class="btn btn-white" onclick="abrirHistorial()"><i data-lucide="history" style="width:16px"></i> Historial</button>
+<button class="btn btn-green" onclick="alertaWhatsApp()"><i data-lucide="message-circle" style="width:16px;color:#fff"></i> Alerta WhatsApp</button>
 </div>
+
+<div class="toolbar" style="margin-top:12px">
+<div style="flex:1;min-width:200px;position:relative"><i data-lucide="search" style="position:absolute;left:12px;top:13px;width:18px;color:#94a3b8"></i><input id="buscador" class="input" style="padding-left:38px" placeholder="Buscar nombre o código" oninput="render()"></div>
+<select id="filtroCat" class="input" style="width:150px" onchange="render()"><option value="todas">Todas cat.</option><option value="gaseosa">Gaseosas</option><option value="botana">Botanas</option><option value="abarrotes">Abarrotes</option></select>
+</div>
+
 <div class="table-wrap">
 <div class="table-head"><div style="display:flex;align-items:center;gap:8px"><i data-lucide="boxes" style="width:18px"></i><b id="tituloTabla">Inventario completo</b></div><span id="contador" class="badge badge-blue">0 productos</span></div>
-<table><thead><tr><th>Producto</th><th>Código</th><th id="thStock">Stock</th><th>Estado</th><th style="text-align:right">Acción</th></tr></thead><tbody id="tbody"></tbody></table>
+<table><thead><tr><th>Producto / Precios x tienda</th><th>Stock actual</th><th>Caducidad</th><th>Estado</th><th style="text-align:right">Acción</th></tr></thead><tbody id="tbody"></tbody></table>
 <div id="mobileList" class="mobile-list"></div>
 </div>
 </div>
 <div id="modal" class="modal-bg">
 <div class="modal">
-<div class="modal-head"><div style="display:flex;align-items:center;gap:8px"><i data-lucide="plus-circle" style="width:20px"></i><b id="modalTitle">Registrar nuevo producto</b></div><button class="btn-icon" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div class="modal-head"><b id="modalTitle">Registrar producto</b><button class="btn-icon" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div>
 <div style="padding:16px">
 <input type="hidden" id="fId">
 <div class="form-grid">
-<div class="form-group" style="grid-column:1 / -1"><label>Nombre del producto</label><input id="fNombre" class="input" placeholder="Ej: Gaseosa Manzana 400ml"></div>
-<div class="form-group"><label>Código de barras</label><input id="fCodigo" class="input" placeholder="750..."></div>
+<div class="form-group" style="grid-column:1/-1"><label>Nombre</label><input id="fNombre" class="input" placeholder="Gaseosa Manzana 400ml"></div>
+<div class="form-group"><label>Código barras</label><input id="fCodigo" class="input" placeholder="750..."></div>
 <div class="form-group"><label>Categoría</label><select id="fCat" class="input"><option value="gaseosa">Gaseosa</option><option value="botana">Botana</option><option value="abarrotes">Abarrotes</option></select></div>
-<div class="form-group"><label>Peso esperado (g)</label><input id="fPeso" type="number" class="input" placeholder="420"></div>
-<div class="form-group"><label>Precio compra</label><input id="fCompra" type="number" class="input" placeholder="10"></div>
-<div class="form-group"><label>Precio venta</label><input id="fVenta" type="number" class="input" placeholder="18"></div>
-<div class="form-group" style="grid-column:1 / -1"><label style="color:var(--blue-dark)">Stock por tienda</label></div>
-<div class="form-group"><label>La Estación</label><input id="fEstacion" type="number" class="input" placeholder="0"></div>
-<div class="form-group"><label>La Turbina</label><input id="fTurbina" type="number" class="input" placeholder="0"></div>
-<div class="form-group"><label>Santa Fe</label><input id="fSantafe" type="number" class="input" placeholder="0"></div>
-<div class="form-group"><label>Stock mínimo alerta</label><input id="fMin" type="number" class="input" placeholder="5"></div>
+<div class="form-group"><label>Peso (g)</label><input id="fPeso" type="number" class="input" placeholder="420"></div>
+<div class="form-group"><label>Caducidad</label><input id="fCad" type="date" class="input"></div>
+<div class="form-group" style="grid-column:1/-1"><label style="color:var(--blue-dark)">Precios y stock por tienda</label></div>
+<div class="form-group"><label>Estación - Compra</label><input id="fEstC" type="number" class="input" placeholder="10"></div>
+<div class="form-group"><label>Estación - Venta</label><input id="fEstV" type="number" class="input" placeholder="18"></div>
+<div class="form-group"><label>Estación - Stock</label><input id="fEstS" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>Turbina - Compra</label><input id="fTurC" type="number" class="input" placeholder="10"></div>
+<div class="form-group"><label>Turbina - Venta</label><input id="fTurV" type="number" class="input" placeholder="18"></div>
+<div class="form-group"><label>Turbina - Stock</label><input id="fTurS" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>Santa Fe - Compra</label><input id="fSfeC" type="number" class="input" placeholder="10"></div>
+<div class="form-group"><label>Santa Fe - Venta</label><input id="fSfeV" type="number" class="input" placeholder="18"></div>
+<div class="form-group"><label>Santa Fe - Stock</label><input id="fSfeS" type="number" class="input" placeholder="0"></div>
+<div class="form-group"><label>Stock mínimo</label><input id="fMin" type="number" class="input" placeholder="5"></div>
 </div>
-<div style="display:flex;gap:8px;margin-top:16px">
-<button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarModal()">Cancelar</button>
-<button class="btn btn-blue" style="flex:1" onclick="guardarProducto()"><i data-lucide="save" style="width:16px;color:#fff"></i> Guardar</button>
+<div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarModal()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarProducto()">Guardar</button></div>
 </div>
 </div>
+</div>
+
+<div id="modalTraspaso" class="modal-bg">
+<div class="modal" style="max-width:420px">
+<div class="modal-head"><b><i data-lucide="arrow-left-right" style="width:16px"></i> Traspaso entre tiendas</b><button class="btn-icon" onclick="cerrarTraspaso()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div style="padding:16px">
+<div class="form-group"><label>Producto</label><select id="tProd" class="input"></select></div>
+<div class="form-grid" style="margin-top:12px"><div class="form-group"><label>De tienda</label><select id="tDe" class="input"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-group"><label>A tienda</label><select id="tA" class="input"><option value="turbina">Turbina</option><option value="estacion">Estación</option><option value="santafe">Santa Fe</option></select></div></div>
+<div class="form-group" style="margin-top:12px"><label>Cantidad a transferir</label><input id="tCant" type="number" class="input" placeholder="Ej: 10"></div>
+<button class="btn btn-blue" style="width:100%;margin-top:14px" onclick="ejecutarTraspaso()">Transferir ahora</button>
+</div>
+</div>
+</div>
+
+<div id="modalCompra" class="modal-bg">
+<div class="modal" style="max-width:440px">
+<div class="modal-head"><b><i data-lucide="truck" style="width:16px"></i> Entrada por compra / Factura</b><button class="btn-icon" onclick="cerrarCompra()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div style="padding:16px">
+<div class="form-group"><label>Producto</label><select id="cProd" class="input"></select></div>
+<div class="form-group" style="margin-top:12px"><label>Tienda que recibe</label><select id="cTienda" class="input"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div>
+<div class="form-grid" style="margin-top:12px"><div class="form-group"><label>Cantidad comprada</label><input id="cCant" type="number" class="input" placeholder="20"></div><div class="form-group"><label>Costo unitario nuevo</label><input id="cCosto" type="number" class="input" placeholder="10"></div></div>
+<div class="form-group" style="margin-top:12px"><label>Folio factura / proveedor</label><input id="cFolio" class="input" placeholder="FAC-123 - Coca Cola"></div>
+<button class="btn btn-blue" style="width:100%;margin-top:14px" onclick="ejecutarCompra()">Registrar entrada</button>
+</div>
+</div>
+</div>
+
+<div id="modalConteo" class="modal-bg">
+<div class="modal" style="max-width:440px">
+<div class="modal-head"><b><i data-lucide="clipboard-check" style="width:16px"></i> Conteo físico rápido</b><button class="btn-icon" onclick="cerrarConteo()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div style="padding:16px">
+<div class="form-group"><label>Tienda a contar</label><select id="coTienda" class="input" onchange="actualizarConteo()"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div>
+<div class="form-group" style="margin-top:12px"><label>Producto</label><select id="coProd" class="input" onchange="actualizarConteo()"></select></div>
+<div style="background:var(--gray);border-radius:12px;padding:12px;margin-top:12px;display:flex;justify-content:space-between"><div><small style="color:#64748b">En sistema</small><br><b id="coSistema" style="font-size:20px">0</b></div><div style="text-align:right"><small style="color:#64748b">Diferencia</small><br><b id="coDiff" style="font-size:20px">0</b></div></div>
+<div class="form-group" style="margin-top:12px"><label>¿Cuánto contaste realmente?</label><input id="coReal" type="number" class="input" style="height:56px;font-size:22px;font-weight:800;text-align:center" placeholder="0" oninput="actualizarConteo()"></div>
+<button class="btn btn-black" style="width:100%;margin-top:14px" onclick="ejecutarConteo()">Ajustar inventario</button>
+<small style="color:#64748b;display:block;margin-top:8px;text-align:center">Quedará registrado en historial como merma o ajuste</small>
+</div>
+</div>
+</div>
+
+<div id="modalHist" class="modal-bg">
+<div class="modal">
+<div class="modal-head"><b><i data-lucide="history" style="width:16px"></i> Historial - Quién hizo qué</b><button class="btn-icon" onclick="cerrarHist()"><i data-lucide="x" style="width:16px"></i></button></div>
+<div id="listaHist" style="max-height:60vh;overflow:auto"></div>
+<div style="padding:12px;display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="limpiarHist()">Limpiar</button><button class="btn btn-blue" style="flex:1" onclick="cerrarHist()">Cerrar</button></div>
 </div>
 </div>
 
 <div id="modalPass" class="modal-bg">
-<div class="modal" style="max-width:360px">
-<div style="padding:24px;text-align:center">
+<div class="modal" style="max-width:360px"><div style="padding:24px;text-align:center">
 <div style="width:56px;height:56px;background:var(--blue2);border-radius:16px;display:flex;align-items:center;justify-content:center;margin:0 auto 12px"><i data-lucide="lock" style="color:var(--blue-dark)"></i></div>
-<b>Acción de administrador</b><br><small style="color:#64748b">Ingresa contraseña 0831</small>
+<b>Administrador</b><br><small style="color:#64748b">Contraseña 0831</small>
 <input id="inputPass" type="password" maxlength="4" class="input" style="margin-top:16px;height:52px;text-align:center;font-size:24px;letter-spacing:8px;font-weight:800" placeholder="••••">
 <div id="passError" style="color:#dc2626;font-size:12px;font-weight:700;margin-top:8px;display:none">Contraseña incorrecta</div>
-<div style="display:flex;gap:8px;margin-top:16px">
-<button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarPass()">Cancelar</button>
-<button class="btn btn-blue" style="flex:1" onclick="verificarPass()">Confirmar</button>
-</div>
-</div>
-</div>
-</div>
+<div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarPass()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="verificarPass()">Confirmar</button></div>
+</div></div>
+                                                                                                              </div>
 <script>
 const PASS_ADMIN='0831';
-let tiendaActual='todas';
-let accionPendiente=null;
-let productoPendiente=null;
+let tiendaActual='todas', accionPendiente=null, productoPendiente=null;
 let productos=[
-{ id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, compra:10, venta:18, stock:{estacion:25,turbina:12,santafe:18}, min:5 },
-{ id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, compra:12, venta:20, stock:{estacion:40,turbina:30,santafe:15}, min:10 },
-{ id:3, nombre:'Coca 600ml', codigo:'750123003', cat:'gaseosa', peso:620, compra:14, venta:22, stock:{estacion:8,turbina:3,santafe:20}, min:8 },
-{ id:4, nombre:'Gansito Marinela', codigo:'750123004', cat:'botana', peso:50, compra:8, venta:15, stock:{estacion:0,turbina:20,santafe:5}, min:5 },
+{ id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, stock:{estacion:25,turbina:12,santafe:18}, precio:{estacion:{c:10,v:18},turbina:{c:10,v:19},santafe:{c:10,v:20}}, min:5, cad:'2026-09-15'},
+{ id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, stock:{estacion:40,turbina:30,santafe:15}, precio:{estacion:{c:12,v:20},turbina:{c:12,v:20},santafe:{c:12,v:21}}, min:10, cad:'2026-09-02'},
+{ id:3, nombre:'Coca 600ml', codigo:'750123003', cat:'gaseosa', peso:620, stock:{estacion:8,turbina:3,santafe:20}, precio:{estacion:{c:14,v:22},turbina:{c:14,v:23},santafe:{c:14,v:24}}, min:8, cad:'2026-12-01'},
+{ id:4, nombre:'Gansito Marinela', codigo:'750123004', cat:'botana', peso:50, stock:{estacion:0,turbina:20,santafe:5}, precio:{estacion:{c:8,v:15},turbina:{c:8,v:15},santafe:{c:8,v:16}}, min:5, cad:'2026-08-30'},
+];
+let historial=[
+{ts:Date.now()-3600000, user:'Admin', accion:'Creó producto', detalle:'Gaseosa Manzana'},
 ];
 
-function cambiarTienda(t){
-tiendaActual=t;
-document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tienda===t));
-document.getElementById('labelTienda').innerText=t.toUpperCase();
-document.getElementById('tituloTabla').innerText= t==='todas'? 'Inventario completo' : 'Inventario - '+t;
-document.getElementById('thStock').innerText= t==='todas'? 'Stock por tienda' : 'Stock en '+t;
-render();
-}
-function getStockTienda(p){
-if(tiendaActual==='todas') return p.stock.estacion+p.stock.turbina+p.stock.santafe;
-return p.stock[tiendaActual]||0;
-}
+function log(accion,detalle){historial.unshift({ts:Date.now(), user:'Admin (Tú)', accion, detalle});}
+function cambiarTienda(t){tiendaActual=t;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tienda===t));document.getElementById('labelTienda').innerText=t.toUpperCase();document.getElementById('tituloTabla').innerText= t==='todas'? 'Inventario completo' : 'Inventario - '+t;render();}
+function getStockTienda(p){if(tiendaActual==='todas') return p.stock.estacion+p.stock.turbina+p.stock.santafe; return p.stock[tiendaActual]||0;}
+function diasParaCad(p){if(!p.cad) return 999; let diff=(new Date(p.cad)-new Date())/86400000; return Math.floor(diff);}
 function render(){
 let q=document.getElementById('buscador').value.toLowerCase();
 let cat=document.getElementById('filtroCat').value;
@@ -144,35 +204,54 @@ let matchCat=cat==='todas'||p.cat===cat;
 let matchTienda=tiendaActual==='todas'? true : p.stock[tiendaActual]>0;
 return matchQ&&matchCat&&matchTienda;
 });
-let tbody=document.getElementById('tbody');
-let mobile=document.getElementById('mobileList');
+let tbody=document.getElementById('tbody'), mobile=document.getElementById('mobileList');
 tbody.innerHTML=''; mobile.innerHTML='';
 filtrados.forEach(p=>{
 let stockActual=getStockTienda(p);
 let total=p.stock.estacion+p.stock.turbina+p.stock.santafe;
 let bajo= tiendaActual==='todas'? total<=p.min : stockActual<=p.min;
-let stockHtml= tiendaActual==='todas'? `<span style="font-size:11px">EST:${p.stock.estacion} | TUR:${p.stock.turbina} | SFE:${p.stock.santafe} = <b>${total}</b></span>` : `<b style="font-size:16px">${stockActual}</b>`;
-tbody.innerHTML+=`<tr><td><div style="display:flex;align-items:center;gap:8px"><div style="width:32px;height:32px;background:var(--blue2);border-radius:8px;display:flex;align-items:center;justify-content:center"><i data-lucide="package" style="width:16px;color:var(--blue-dark)"></i></div><div><b>${p.nombre}</b><br><small style="color:#64748b">${p.codigo} - ${p.peso}g - $${p.venta}</small></div></div></td><td><small>${p.codigo}</small></td><td>${stockHtml}</td><td><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></td><td><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-icon" onclick="pedirPermiso('editar',${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="pedirPermiso('eliminar',${p.id})"><i data-lucide="trash-2" style="width:14px;color:#dc2626"></i></button></div></td></tr>`;
-mobile.innerHTML+=`<div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between"><div><b>${p.nombre}</b><br><small style="color:#64748b">${p.codigo}</small></div><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></div><div style="background:var(--gray);border-radius:10px;padding:10px;margin-top:10px;display:flex;justify-content:space-between;align-items:center"><div><small style="color:#64748b">${tiendaActual==='todas'?'Total':'Stock en '+tiendaActual}</small><br><b style="font-size:18px">${tiendaActual==='todas'?total:stockActual}</b></div><div style="display:flex;gap:6px"><button class="btn-icon" onclick="pedirPermiso('editar',${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="pedirPermiso('eliminar',${p.id})"><i data-lucide="trash-2" style="width:14px;color:#dc2626"></i></button></div></div></div>`;
+let dias=diasParaCad(p);
+let cadTxt= dias===999? 'Sin fecha' : dias<0? `Caducó hace ${Math.abs(dias)}d` : dias<=7? `Caduca en ${dias}d` : p.cad;
+let cadClass= dias<0? 'badge-red' : dias<=7? 'badge-orange' : 'badge-green';
+let precioTxt= tiendaActual==='todas'? `EST $${p.precio.estacion.v} | TUR $${p.precio.turbina.v} | SFE $${p.precio.santafe.v}` : `Compra $${p.precio[tiendaActual].c} / Venta $${p.precio[tiendaActual].v}`;
+let stockHtml= tiendaActual==='todas'? `EST:${p.stock.estacion} TUR:${p.stock.turbina} SFE:${p.stock.santafe} = <b>${total}</b>` : `<b style="font-size:18px">${stockActual}</b>`;
+tbody.innerHTML+=`<tr><td><div style="display:flex;gap:8px"><div style="width:32px;height:32px;background:var(--blue2);border-radius:8px;display:flex;align-items:center;justify-content:center"><i data-lucide="package" style="width:16px;color:var(--blue-dark)"></i></div><div><b>${p.nombre}</b><br><small style="color:#64748b">${p.codigo} - ${p.peso}g</small><br><small style="color:var(--blue-dark);font-weight:700">${precioTxt}</small></div></div></td><td>${stockHtml}</td><td><span class="badge ${cadClass}">${cadTxt}</span></td><td><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></td><td><div style="display:flex;gap:6px;justify-content:flex-end"><button class="btn-icon" onclick="pedirPermiso('editar',${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="pedirPermiso('eliminar',${p.id})"><i data-lucide="trash-2" style="width:14px;color:#dc2626"></i></button></div></td></tr>`;
+mobile.innerHTML+=`<div style="padding:14px 16px;border-bottom:1px solid var(--border)"><div style="display:flex;justify-content:space-between"><div><b>${p.nombre}</b><br><small>${p.codigo} | ${precioTxt}</small></div><span class="badge ${bajo?'badge-red':'badge-green'}">${bajo?'Bajo':'OK'}</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px"><div style="background:var(--gray);border-radius:10px;padding:10px"><small>Stock ${tiendaActual}</small><br><b>${tiendaActual==='todas'?total:stockActual}</b></div><div style="background:var(--gray);border-radius:10px;padding:10px"><small>Caducidad</small><br><span class="badge ${cadClass}">${cadTxt}</span></div></div><div style="display:flex;gap:6px;margin-top:10px;justify-content:flex-end"><button class="btn-icon" onclick="pedirPermiso('editar',${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="pedirPermiso('eliminar',${p.id})"><i data-lucide="trash-2" style="width:14px;color:#dc2626"></i></button></div></div>`;
 });
 document.getElementById('contador').innerText=filtrados.length+' productos';
 document.getElementById('kpiTotal').innerText=filtrados.length;
-document.getElementById('kpiSub').innerText= tiendaActual==='todas'? 'En todas las tiendas' : 'Solo en '+tiendaActual;
+document.getElementById('kpiSub').innerText= tiendaActual==='todas'? 'todas las tiendas' : 'en '+tiendaActual;
 document.getElementById('kpiBajo').innerText=filtrados.filter(p=> getStockTienda(p)<=p.min ).length;
-let valor=filtrados.reduce((a,p)=>a+ (getStockTienda(p)*p.compra),0);
+document.getElementById('kpiCad').innerText=filtrados.filter(p=> diasParaCad(p)<=7).length;
+let valor=filtrados.reduce((a,p)=>{ let c= tiendaActual==='todas'? (p.stock.estacion*p.precio.estacion.c + p.stock.turbina*p.precio.turbina.c + p.stock.santafe*p.precio.santafe.c) : getStockTienda(p)*p.precio[tiendaActual].c; return a+c; },0);
 document.getElementById('kpiValor').innerText='$'+valor.toLocaleString('es-MX');
 lucide.createIcons();
 }
-function pedirPermiso(accion,id){accionPendiente=accion;productoPendiente=id;document.getElementById('modalPass').style.display='flex';document.getElementById('inputPass').value='';document.getElementById('passError').style.display='none';setTimeout(()=>document.getElementById('inputPass').focus(),100);}
-function cerrarPass(){document.getElementById('modalPass').style.display='none';accionPendiente=null;productoPendiente=null;}
-function verificarPass(){let pass=document.getElementById('inputPass').value;if(pass!==PASS_ADMIN){document.getElementById('passError').style.display='block';return;}document.getElementById('modalPass').style.display='none';if(accionPendiente==='eliminar'){eliminarDefinitivo(productoPendiente);}if(accionPendiente==='editar'){abrirEditar(productoPendiente);}}
-function eliminarDefinitivo(id){if(!confirm('¿Eliminar este producto?'))return;productos=productos.filter(p=>p.id!==id);render();}
-function abrirEditar(id){let p=productos.find(x=>x.id===id);if(!p)return;document.getElementById('modalTitle').innerText='Editar producto';document.getElementById('fId').value=p.id;document.getElementById('fNombre').value=p.nombre;document.getElementById('fCodigo').value=p.codigo;document.getElementById('fCat').value=p.cat;document.getElementById('fPeso').value=p.peso;document.getElementById('fCompra').value=p.compra;document.getElementById('fVenta').value=p.venta;document.getElementById('fEstacion').value=p.stock.estacion;document.getElementById('fTurbina').value=p.stock.turbina;document.getElementById('fSantafe').value=p.stock.santafe;document.getElementById('fMin').value=p.min;abrirModal();}
-function abrirModal(){if(!document.getElementById('fId').value){document.getElementById('modalTitle').innerText='Registrar nuevo producto';}document.getElementById('modal').style.display='flex';}
+function pedirPermiso(a,id){accionPendiente=a;productoPendiente=id;document.getElementById('modalPass').style.display='flex';document.getElementById('inputPass').value='';document.getElementById('passError').style.display='none';setTimeout(()=>document.getElementById('inputPass').focus(),100);}
+function cerrarPass(){document.getElementById('modalPass').style.display='none';}
+function verificarPass(){if(document.getElementById('inputPass').value!==PASS_ADMIN){document.getElementById('passError').style.display='block';return;}document.getElementById('modalPass').style.display='none';if(accionPendiente==='eliminar') eliminarDefinitivo(productoPendiente); if(accionPendiente==='editar') abrirEditar(productoPendiente);}
+function eliminarDefinitivo(id){let p=productos.find(x=>x.id===id);productos=productos.filter(p=>p.id!==id);log('Eliminó producto', p? p.nombre:'ID '+id);render();}
+function abrirEditar(id){let p=productos.find(x=>x.id===id);document.getElementById('modalTitle').innerText='Editar producto';document.getElementById('fId').value=p.id;document.getElementById('fNombre').value=p.nombre;document.getElementById('fCodigo').value=p.codigo;document.getElementById('fCat').value=p.cat;document.getElementById('fPeso').value=p.peso;document.getElementById('fCad').value=p.cad||'';document.getElementById('fEstC').value=p.precio.estacion.c;document.getElementById('fEstV').value=p.precio.estacion.v;document.getElementById('fEstS').value=p.stock.estacion;document.getElementById('fTurC').value=p.precio.turbina.c;document.getElementById('fTurV').value=p.precio.turbina.v;document.getElementById('fTurS').value=p.stock.turbina;document.getElementById('fSfeC').value=p.precio.santafe.c;document.getElementById('fSfeV').value=p.precio.santafe.v;document.getElementById('fSfeS').value=p.stock.santafe;document.getElementById('fMin').value=p.min;abrirModal();}
+function abrirModal(){if(!document.getElementById('fId').value)document.getElementById('modalTitle').innerText='Registrar producto';document.getElementById('modal').style.display='flex';}
 function cerrarModal(){document.getElementById('modal').style.display='none';document.getElementById('fId').value='';document.getElementById('fNombre').value='';document.getElementById('fCodigo').value='';}
-function guardarProducto(){let id=document.getElementById('fId').value;let n=document.getElementById('fNombre').value;let c=document.getElementById('fCodigo').value;if(!n||!c){alert('Nombre y código obligatorios');return;}let data={nombre:n,codigo:c,cat:document.getElementById('fCat').value,peso:parseInt(document.getElementById('fPeso').value)||0,compra:parseFloat(document.getElementById('fCompra').value)||0,venta:parseFloat(document.getElementById('fVenta').value)||0,stock:{estacion:parseInt(document.getElementById('fEstacion').value)||0,turbina:parseInt(document.getElementById('fTurbina').value)||0,santafe:parseInt(document.getElementById('fSantafe').value)||0},min:parseInt(document.getElementById('fMin').value)||5};if(id){let idx=productos.findIndex(p=>p.id==id);productos[idx]={...productos[idx],...data};}else{productos.unshift({id:Date.now(),...data});}cerrarModal();render();}
-render();lucide.createIcons();
+function guardarProducto(){let id=document.getElementById('fId').value;let data={nombre:document.getElementById('fNombre').value,codigo:document.getElementById('fCodigo').value,cat:document.getElementById('fCat').value,peso:parseInt(document.getElementById('fPeso').value)||0,cad:document.getElementById('fCad').value,stock:{estacion:parseInt(document.getElementById('fEstS').value)||0,turbina:parseInt(document.getElementById('fTurS').value)||0,santafe:parseInt(document.getElementById('fSfeS').value)||0},precio:{estacion:{c:parseFloat(document.getElementById('fEstC').value)||0,v:parseFloat(document.getElementById('fEstV').value)||0},turbina:{c:parseFloat(document.getElementById('fTurC').value)||0,v:parseFloat(document.getElementById('fTurV').value)||0},santafe:{c:parseFloat(document.getElementById('fSfeC').value)||0,v:parseFloat(document.getElementById('fSfeV').value)||0}},min:parseInt(document.getElementById('fMin').value)||5};if(!data.nombre||!data.codigo){alert('Falta nombre o código');return;}if(id){let idx=productos.findIndex(p=>p.id==id);productos[idx]={...productos[idx],...data};log('Editó producto', data.nombre);}else{productos.unshift({id:Date.now(),...data});log('Registró producto', data.nombre);}cerrarModal();render();}
+function llenarSelects(){let html=productos.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join('');document.getElementById('tProd').innerHTML=html;document.getElementById('cProd').innerHTML=html;document.getElementById('coProd').innerHTML=html;}
+function abrirTraspaso(){llenarSelects();document.getElementById('modalTraspaso').style.display='flex';lucide.createIcons();}
+function cerrarTraspaso(){document.getElementById('modalTraspaso').style.display='none';}
+function ejecutarTraspaso(){let id=parseInt(document.getElementById('tProd').value);let de=document.getElementById('tDe').value;let a=document.getElementById('tA').value;let cant=parseInt(document.getElementById('tCant').value)||0;if(de===a){alert('Tiendas iguales');return;}let p=productos.find(x=>x.id===id);if(p.stock[de]<cant){alert('No hay suficiente stock en '+de+' (tiene '+p.stock[de]+')');return;}p.stock[de]-=cant;p.stock[a]+=cant;log('Traspaso', `${cant} ${p.nombre} de ${de} a ${a}`);cerrarTraspaso();render();alert(`Traspaso OK: ${cant} de ${de} a ${a}`);}
+function abrirCompra(){llenarSelects();document.getElementById('modalCompra').style.display='flex';}
+function cerrarCompra(){document.getElementById('modalCompra').style.display='none';}
+function ejecutarCompra(){let id=parseInt(document.getElementById('cProd').value);let tienda=document.getElementById('cTienda').value;let cant=parseInt(document.getElementById('cCant').value)||0;let costo=parseFloat(document.getElementById('cCosto').value)||0;let folio=document.getElementById('cFolio').value;let p=productos.find(x=>x.id===id);p.stock[tienda]+=cant;if(costo>0)p.precio[tienda].c=costo;log('Entrada por compra', `${cant} ${p.nombre} a ${tienda} - ${folio} costo $${costo}`);cerrarCompra();render();alert('Entrada registrada');}
+function abrirConteo(){llenarSelects();document.getElementById('modalConteo').style.display='flex';actualizarConteo();}
+function cerrarConteo(){document.getElementById('modalConteo').style.display='none';}
+function actualizarConteo(){let id=parseInt(document.getElementById('coProd').value);let tienda=document.getElementById('coTienda').value;let p=productos.find(x=>x.id===id);if(!p)return;let sistema=p.stock[tienda]||0;let real=parseInt(document.getElementById('coReal').value)||0;document.getElementById('coSistema').innerText=sistema;document.getElementById('coDiff').innerText=real-sistema;document.getElementById('coDiff').style.color= real-sistema<0? '#dc2626':'#16a34a';}
+function ejecutarConteo(){let id=parseInt(document.getElementById('coProd').value);let tienda=document.getElementById('coTienda').value;let real=parseInt(document.getElementById('coReal').value);if(isNaN(real)){alert('Escribe cuánto contaste');return;}let p=productos.find(x=>x.id===id);let anterior=p.stock[tienda];p.stock[tienda]=real;log('Conteo físico / merma', `${p.nombre} en ${tienda}: sistema ${anterior} -> real ${real} diff ${real-anterior}`);cerrarConteo();render();}
+function abrirHistorial(){document.getElementById('modalHist').style.display='flex';let html=historial.map(h=>{let d=new Date(h.ts).toLocaleString('es-MX');return `<div class="log-item"><div style="width:32px;height:32px;background:var(--blue2);border-radius:8px;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i data-lucide="user" style="width:14px"></i></div><div><b>${h.accion}</b> - ${h.detalle}<br><small style="color:#64748b">${h.user} - ${d}</small></div></div>`}).join('')||'<div style="padding:20px;text-align:center;color:#64748b">Sin movimientos</div>';document.getElementById('listaHist').innerHTML=html;lucide.createIcons();}
+function cerrarHist(){document.getElementById('modalHist').style.display='none';}
+function limpiarHist(){if(confirm('¿Limpiar historial?')){historial=[];abrirHistorial();}}
+function alertaWhatsApp(){let bajos=productos.filter(p=>{let s= tiendaActual==='todas'? p.stock.estacion+p.stock.turbina+p.stock.santafe : p.stock[tiendaActual]; return s<=p.min;});if(bajos.length===0){alert('No hay stock bajo en esta vista');return;}let msg=`*ALERTA STOCK BAJO - KIGO SUPER ${tiendaActual.toUpperCase()}*%0A%0A`;bajos.forEach(p=>{let s= tiendaActual==='todas'? p.stock.estacion+p.stock.turbina+p.stock.santafe : p.stock[tiendaActual]; msg+=`• ${p.nombre}: quedan ${s} (min ${p.min})%0A`;});let caducan=productos.filter(p=>diasParaCad(p)<=7 && diasParaCad(p)>=0);if(caducan.length>0){msg+=`%0A*POR CADUCAR*%0A`;caducan.forEach(p=>{msg+=`• ${p.nombre}: ${p.cad}%0A`;});}let url=`https://wa.me/?text=${msg}`;window.open(url,'_blank');log('Alerta WhatsApp enviada', `${bajos.length} productos bajos`);}
+render();llenarSelects();lucide.createIcons();
 document.getElementById('inputPass').addEventListener('keydown',e=>{if(e.key==='Enter')verificarPass()});
 </script>
 </body>
-</html>
+</html>                                                                                                              
