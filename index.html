@@ -64,7 +64,9 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 .caja-bottom{display:flex;justify-content:space-between;align-items:center;padding:16px;background:#fff;border-top:2px solid var(--black);gap:16px;flex-wrap:wrap}
 .input-scan{flex:1;height:52px;border:2px solid var(--blue);border-radius:12px;padding:0 16px;font-size:16px;font-weight:700;min-width:200px}
 .total-box{background:var(--black);color:#fff;padding:12px 20px;border-radius:12px;text-align:right;min-width:220px}
-.total-value{font-size:36px;font-weight:800;letter-spacing:-1px}
+.total-box *{color:#fff!important}
+.total-label{font-size:10px;letter-spacing:1px;color:#fff!important;opacity:.7}
+.total-value{font-size:36px;font-weight:800;letter-spacing:-1px;color:#fff!important}
 .qty-box{display:flex;align-items:center;gap:4px;background:var(--gray);border-radius:8px;padding:2px}
 .qty-btn{width:24px;height:24px;border-radius:6px;border:1px solid var(--border);background:#fff;cursor:pointer;font-weight:800;display:flex;align-items:center;justify-content:center;font-size:12px}
 .ticket{font-family:monospace;font-size:12px;line-height:1.4;white-space:pre-wrap;background:#fff;padding:16px;border:1px dashed #000;max-width:280px;margin:0 auto}
@@ -118,14 +120,12 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 <div class="table-wrap">
 <div class="table-head"><b id="tituloTabla">Inventario completo</b><span id="contador" class="badge badge-blue">0 productos</span></div>
 <table><thead><tr><th>Producto</th><th>Stock</th><th>Semáforo</th><th>Estado</th><th style="text-align:right">Acción</th></tr></thead><tbody id="tbody"></tbody></table>
-<div id="mobileList" class="mobile-list"></div>
 </div>
 </div>
 </div>
-
 <div id="panelCajero" class="caja-layout" style="display:none">
 <div class="caja-top">
-<div style="display:flex;align-items:center;gap:8px;flex:1"><i data-lucide="scan-barcode" style="width:20px;color:var(--blue-dark)"></i><input id="inputScan" class="input-scan" placeholder="Escanea código de barra o escribe + ENTER" onkeydown="if(event.key==='Enter') agregarPorCodigo()"><button class="btn-s btn-black" style="height:52px" onclick="agregarPorCodigo()">Agregar</button></div>
+<div style="display:flex;align-items:center;gap:8px;flex:1"><i data-lucide="scan-barcode" style="width:20px;color:var(--blue-dark)"></i><input id="inputScan" class="input-scan" placeholder="Escanea o ENTER para duplicar último + ESC para cobrar" onkeydown="handleScanKey(event)"><button class="btn-s btn-black" style="height:52px" onclick="agregarPorCodigo()">Agregar</button></div>
 <div id="labelCajaTienda" style="font-size:12px;font-weight:800;background:var(--blue2);color:var(--blue-dark);padding:8px 12px;border-radius:999px"></div>
 </div>
 <div class="caja-table-wrap">
@@ -133,11 +133,11 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 <thead><tr><th style="width:110px">CANTIDAD</th><th>DESCRIPCIÓN</th><th style="width:90px">EXISTENCIA</th><th style="width:90px">DESCUENTO</th><th style="width:120px">P. UNITARIO</th><th style="width:120px">P. FINAL</th><th style="width:60px">ELIMINAR</th></tr></thead>
 <tbody id="cartList"></tbody>
 </table>
-<div id="cartEmpty" style="padding:60px;text-align:center;color:#94a3b8;display:none"><i data-lucide="shopping-cart" style="width:48px;height:48px;color:#cbd5e1"></i><br><b>Carrito vacío</b><br><small>Escanea un producto para empezar</small></div>
+<div id="cartEmpty" style="padding:60px;text-align:center;color:#94a3b8;display:none"><b>Carrito vacío</b><br><small>Escanea producto - ENTER duplica último - ESC cobra</small></div>
 </div>
 <div class="caja-bottom">
-<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-s btn-white" style="height:44px" onclick="limpiarCarrito()"><i data-lucide="trash-2" style="width:16px"></i> Cancelar venta</button><button class="btn-s btn-white" style="height:44px" onclick="verCorte()"><i data-lucide="receipt" style="width:16px"></i> Corte: <span id="corteVentas">0</span> ventas - <span id="corteTotal">$0</span></button></div>
-<div style="display:flex;align-items:center;gap:16px"><div style="text-align:right"><div style="font-size:11px;color:#64748b">ARTÍCULOS</div><div style="font-weight:800" id="totalItems">0</div></div><div class="total-box"><div style="font-size:10px;color:#94a3b8;letter-spacing:1px">TOTAL</div><div class="total-value" id="totalValor">$0.00</div></div><button class="btn-s" style="height:52px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;padding:0 24px" onclick="abrirCobro()"><i data-lucide="banknote" style="width:20px;color:#fff"></i> COBRAR</button></div>
+<div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn-s btn-white" style="height:44px" onclick="limpiarCarrito()"><i data-lucide="trash-2" style="width:16px"></i> Cancelar</button><button class="btn-s btn-white" style="height:44px" onclick="verCorte()"><i data-lucide="receipt" style="width:16px"></i> Corte: <span id="corteVentas">0</span> - <span id="corteTotal">$0</span></button></div>
+<div style="display:flex;align-items:center;gap:16px"><div style="text-align:right"><div style="font-size:11px;color:#64748b">ARTÍCULOS</div><div style="font-weight:800" id="totalItems">0</div></div><div class="total-box"><div class="total-label">TOTAL</div><div class="total-value" id="totalValor">$0.00</div></div><button class="btn-s" style="height:52px;background:var(--blue);color:#fff;font-size:15px;font-weight:800;padding:0 24px" onclick="abrirCobro()">COBRAR [ESC]</button></div>
 </div>
 </div>
 <div id="modal" class="modal-bg"><div class="modal"><div class="modal-head"><b id="modalTitle">Registrar producto</b><button class="btn-icon" onclick="cerrarModal()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><input type="hidden" id="fId"><div class="form-grid"><div class="form-group" style="grid-column:1/-1"><label>Nombre</label><input id="fNombre" class="input"></div><div class="form-group"><label>Código</label><input id="fCodigo" class="input"></div><div class="form-group"><label>Categoría</label><select id="fCat" class="input"><option value="gaseosa">Gaseosa</option><option value="botana">Botana</option><option value="abarrotes">Abarrotes</option></select></div><div class="form-group"><label>Peso (g)</label><input id="fPeso" type="number" class="input"></div><div class="form-group"><label>Caducidad</label><input id="fCad" type="date" class="input"></div><div class="form-group"><label>Stock mínimo</label><input id="fMin" type="number" class="input"></div><div class="form-group" style="grid-column:1/-1"><label style="color:var(--blue-dark)">Stock y precios por tienda</label></div><div class="form-group"><label>Estación Compra</label><input id="fEstC" type="number" class="input"></div><div class="form-group"><label>Estación Venta</label><input id="fEstV" type="number" class="input"></div><div class="form-group"><label>Estación Stock</label><input id="fEstS" type="number" class="input"></div><div class="form-group"><label>Turbina Compra</label><input id="fTurC" type="number" class="input"></div><div class="form-group"><label>Turbina Venta</label><input id="fTurV" type="number" class="input"></div><div class="form-group"><label>Turbina Stock</label><input id="fTurS" type="number" class="input"></div><div class="form-group"><label>Santa Fe Compra</label><input id="fSfeC" type="number" class="input"></div><div class="form-group"><label>Santa Fe Venta</label><input id="fSfeV" type="number" class="input"></div><div class="form-group"><label>Santa Fe Stock</label><input id="fSfeS" type="number" class="input"></div></div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn" style="flex:1;background:#fff;border:1.5px solid var(--border)" onclick="cerrarModal()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarProducto()">Guardar</button></div></div></div></div>
@@ -147,8 +147,8 @@ td{padding:12px 10px;border-bottom:1px solid var(--border);font-size:13px}
 <div id="modalConteo" class="modal-bg"><div class="modal" style="max-width:440px"><div class="modal-head"><b>Conteo físico</b><button class="btn-icon" onclick="cerrarConteo()"><i data-lucide="x" style="width:16px"></i></button></div><div style="padding:16px"><div class="form-group"><label>Tienda</label><select id="coTienda" class="input" onchange="actualizarConteo()"><option value="estacion">Estación</option><option value="turbina">Turbina</option><option value="santafe">Santa Fe</option></select></div><div class="form-group" style="margin-top:12px"><label>Producto</label><select id="coProd" class="input" onchange="actualizarConteo()"></select></div><div style="background:var(--gray);border-radius:12px;padding:12px;margin-top:12px;display:flex;justify-content:space-between"><div><small>Sistema</small><br><b id="coSistema" style="font-size:20px">0</b></div><div style="text-align:right"><small>Diferencia</small><br><b id="coDiff" style="font-size:20px">0</b></div></div><div class="form-group" style="margin-top:12px"><label>Real contado</label><input id="coReal" type="number" class="input" style="height:56px;font-size:22px;font-weight:800;text-align:center" placeholder="0" oninput="actualizarConteo()"></div><button class="btn btn-black" style="width:100%;margin-top:14px" onclick="ejecutarConteo()">Ajustar</button></div></div></div>
 <div id="modalHist" class="modal-bg"><div class="modal"><div class="modal-head"><div><b>Historial</b></div><button class="btn-icon" onclick="cerrarHist()"><i data-lucide="x" style="width:16px"></i></button></div><div style="display:flex;gap:6px;padding:12px;overflow-x:auto;border-bottom:1px solid var(--border)"><button class="btn-s btn-black" id="hTodos" style="height:32px;font-size:11px" onclick="filtrarHist('todos')">Todos</button><button class="btn-s btn-white" id="hTraspaso" style="height:32px" onclick="filtrarHist('traspaso')">Traspasos</button><button class="btn-s btn-white" id="hCompra" style="height:32px" onclick="filtrarHist('compra')">Compras</button><button class="btn-s btn-white" id="hMerma" style="height:32px" onclick="filtrarHist('merma')">Mermas</button><button class="btn-s btn-white" id="hVenta" style="height:32px" onclick="filtrarHist('venta')">Ventas</button><button class="btn-s btn-white" id="hConteo" style="height:32px" onclick="filtrarHist('conteo')">Conteos</button></div><div id="listaHist" style="max-height:55vh;overflow:auto"></div><div style="padding:12px;display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="limpiarHist()">Limpiar</button><button class="btn btn-blue" style="flex:1" onclick="cerrarHist()">Cerrar</button></div></div></div>
 <div id="modalCantidad" class="modal-bg"><div class="modal" style="max-width:340px;text-align:center;padding:24px"><b id="cantNombre" style="font-size:18px">Producto</b><br><small style="color:#64748b">Cambiar cantidad</small><div style="display:flex;align-items:center;justify-content:center;gap:16px;margin:24px 0"><button class="qty-btn" style="width:56px;height:56px;font-size:24px" onclick="cambiarCantModal(-1)">-</button><input id="inputCantModal" type="number" style="width:80px;height:56px;text-align:center;font-size:28px;font-weight:800;border:2px solid var(--border);border-radius:12px" value="1"><button class="qty-btn" style="width:56px;height:56px;font-size:24px" onclick="cambiarCantModal(1)">+</button></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCant()">Cancelar</button><button class="btn btn-blue" style="flex:1" onclick="guardarCantModal()">Aceptar</button></div></div></div>
-<div id="modalCobro" class="modal-bg"><div class="modal" style="max-width:400px;padding:24px"><div style="text-align:center;margin-bottom:16px"><b style="font-size:20px">Cobrar</b></div><div style="background:var(--black);color:#fff;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px"><div style="font-size:11px;color:#94a3b8">TOTAL A COBRAR</div><div style="font-size:36px;font-weight:800" id="cobroTotal">$0.00</div></div><div style="display:grid;gap:12px"><div><label style="font-size:11px;font-weight:700;color:#64748b">EFECTIVO RECIBIDO</label><input id="inputRecibido" type="number" class="input" style="height:56px;font-size:28px;font-weight:800;text-align:center" placeholder="0.00" oninput="calcularCambio()" onkeydown="if(event.key==='Enter') finalizarVenta()"></div><div style="background:#dcfce7;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--green)">CAMBIO A ENTREGAR</div><div style="font-size:32px;font-weight:800;color:var(--green)" id="cobroCambio">$0.00</div></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCobro()">Volver</button><button class="btn btn-black" style="flex:1;background:var(--green);color:#fff" onclick="finalizarVenta()">ACEPTAR</button></div></div></div></div>
-<div id="modalTicket" class="modal-bg"><div class="modal" style="max-width:320px;padding:24px"><div id="ticketContent" class="ticket"></div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-white" style="flex:1" onclick="cerrarTicket()">Cerrar</button><button class="btn btn-black" style="flex:1" onclick="window.print()"><i data-lucide="printer" style="width:16px;color:#fff"></i> Imprimir</button></div><button class="btn btn-blue" style="width:100%;margin-top:8px" onclick="nuevaVenta()">Nueva venta / Cobro nuevo</button></div></div>
+<div id="modalCobro" class="modal-bg"><div class="modal" style="max-width:400px;padding:24px"><div style="text-align:center;margin-bottom:16px"><b style="font-size:20px">Cobrar</b><br><small style="color:#64748b">ESC para abrir - Doble ENTER para aceptar</small></div><div style="background:var(--black);color:#fff;border-radius:12px;padding:16px;text-align:center;margin-bottom:16px"><div style="font-size:11px;color:#fff;opacity:.7">TOTAL A COBRAR</div><div style="font-size:36px;font-weight:800;color:#fff" id="cobroTotal">$0.00</div></div><div style="display:grid;gap:12px"><div><label style="font-size:11px;font-weight:700;color:#64748b">EFECTIVO RECIBIDO [ENTER]</label><input id="inputRecibido" type="number" class="input" style="height:56px;font-size:28px;font-weight:800;text-align:center" placeholder="0.00" oninput="calcularCambio()" onkeydown="handleCobroKey(event)"></div><div style="background:#dcfce7;border-radius:12px;padding:12px;text-align:center"><div style="font-size:11px;color:var(--green)">CAMBIO A ENTREGAR</div><div style="font-size:32px;font-weight:800;color:var(--green)" id="cobroCambio">$0.00</div></div><div style="display:flex;gap:8px"><button class="btn btn-white" style="flex:1" onclick="cerrarCobro()">Volver [ESC]</button><button class="btn btn-black" style="flex:1;background:var(--green);color:#fff" onclick="finalizarVenta()">ACEPTAR [ENTER x2]</button></div></div></div></div>
+<div id="modalTicket" class="modal-bg"><div class="modal" style="max-width:320px;padding:24px"><div id="ticketContent" class="ticket"></div><div style="display:flex;gap:8px;margin-top:16px"><button class="btn btn-white" style="flex:1" onclick="cerrarTicket()">Cerrar</button><button class="btn btn-black" style="flex:1" onclick="window.print()"><i data-lucide="printer" style="width:16px;color:#fff"></i> Imprimir</button></div><button class="btn btn-blue" style="width:100%;margin-top:8px" onclick="nuevaVenta()">Nueva venta</button></div></div>
 <div id="modalCorte" class="modal-bg"><div class="modal"><div class="modal-head"><b>Corte del día - <span id="corteTitulo"></span></b><button class="btn-icon" onclick="document.getElementById('modalCorte').style.display='none'"><i data-lucide="x" style="width:16px"></i></button></div><div id="listaCorte" style="max-height:60vh;overflow:auto"></div><div style="padding:12px"><button class="btn btn-black" style="width:100%" onclick="document.getElementById('modalCorte').style.display='none'">Cerrar</button></div></div></div>
 <script>
 const USUARIOS=[
@@ -159,7 +159,7 @@ const USUARIOS=[
 ];
 const KEY_PRODUCTOS='kigo_productos_v2';
 const KEY_HIST='kigo_historial_v3';
-let sesion=null, tiendaActual='todas', filtroHist='todos', carrito=[], editIndex=null;
+let sesion=null, tiendaActual='todas', filtroHist='todos', carrito=[], editIndex=null, cobroEnterCount=0;
 let productosIniciales=[
 { id:1, nombre:'Gaseosa Manzana 400ml', codigo:'750123001', cat:'gaseosa', peso:420, stock:{estacion:25,turbina:12,santafe:18}, precio:{estacion:{c:10,v:18},turbina:{c:10,v:19},santafe:{c:10,v:20}}, min:5, cad:'2026-09-15', desc:0},
 { id:2, nombre:'Papas Sabritas 45g', codigo:'750123002', cat:'botana', peso:50, stock:{estacion:40,turbina:30,santafe:15}, precio:{estacion:{c:12,v:20},turbina:{c:12,v:20},santafe:{c:12,v:21}}, min:10, cad:'2026-09-02', desc:0},
@@ -211,12 +211,43 @@ let cR=0,cN=0,cA=0; productos.forEach(p=>{let d=diasParaCad(p); if(d<0) cR++; el
 filtrados.forEach(p=>{let stockActual=getStockTienda(p); let total=p.stock.estacion+p.stock.turbina+p.stock.santafe; let agotado=stockActual===0; let d=diasParaCad(p); let sem=getSemaforo(d); let estadoHtml= agotado? `<span class="badge badge-red-strong">AGOTADO</span>` : `<span class="badge badge-green">OK</span>`; let precioTxt= tiendaActual==='todas'? `EST $${p.precio.estacion.v} | TUR $${p.precio.turbina.v} | SFE $${p.precio.santafe.v}` : `V $${p.precio[tiendaActual].v}`; let stockHtml= tiendaActual==='todas'? `${total}` : `${stockActual}`; tbody.innerHTML+=`<tr><td><b>${p.nombre}</b><br><small>${p.codigo}</small><br><small style="color:var(--blue-dark);font-weight:700">${precioTxt}</small></td><td>${stockHtml}</td><td><span class="badge ${sem.cls}">${sem.label}</span></td><td>${estadoHtml}</td><td><button class="btn-icon" onclick="abrirEditar(${p.id})"><i data-lucide="pencil" style="width:14px"></i></button><button class="btn-icon" onclick="eliminarDefinitivo(${p.id})"><i data-lucide="trash-2" style="width:14px;color:var(--red)"></i></button></td></tr>`;});
 document.getElementById('contador').innerText=filtrados.length+' productos'; document.getElementById('kpiTotal').innerText=filtrados.length; document.getElementById('kpiAgotado').innerText=productos.filter(p=> getStockTienda(p)===0 ).length; let valor=filtrados.reduce((a,p)=>{ let c= tiendaActual==='todas'? (p.stock.estacion*p.precio.estacion.c + p.stock.turbina*p.precio.turbina.c + p.stock.santafe*p.precio.santafe.c) : getStockTienda(p)*p.precio[tiendaActual].c; return a+c; },0); document.getElementById('kpiValor').innerText='$'+valor.toLocaleString('es-MX'); lucide.createIcons();
 }
-function agregarPorCodigo(){let code=document.getElementById('inputScan').value.trim().toLowerCase(); if(!code) return; let p=productos.find(x=> x.codigo.toLowerCase()===code || x.nombre.toLowerCase().includes(code)); if(!p){alert('Producto no encontrado: '+code); document.getElementById('inputScan').select(); return;} agregarAlCarrito(p.id); document.getElementById('inputScan').value=''; document.getElementById('inputScan').focus();}
+function handleScanKey(e){
+if(e.key==='Enter'){
+let code=document.getElementById('inputScan').value.trim().toLowerCase();
+if(!code){
+// Si no hay código y hay carrito, duplica el último (primer producto timbrado)
+if(carrito.length>0){
+let ultimo=carrito[0];
+let p=productos.find(x=>x.id===ultimo.id);
+if(p && ultimo.cant < p.stock[tiendaActual]){
+ultimo.cant++;
+renderCaja();
+} else {
+alert('No hay más stock para duplicar');
+}
+}
+} else {
+agregarPorCodigo();
+}
+}
+if(e.key==='Escape'){
+abrirCobro();
+}
+}
+function agregarPorCodigo(){
+let code=document.getElementById('inputScan').value.trim().toLowerCase();
+if(!code) return;
+let p=productos.find(x=> x.codigo.toLowerCase()===code || x.nombre.toLowerCase().includes(code));
+if(!p){alert('Producto no encontrado: '+code); document.getElementById('inputScan').select(); return;}
+agregarAlCarrito(p.id);
+document.getElementById('inputScan').value='';
+document.getElementById('inputScan').focus();
+}
 function agregarAlCarrito(id){
 let p=productos.find(x=>x.id===id);
 let stockReal=p.stock[tiendaActual]||0;
 let enCarrito=carrito.find(c=>c.id===id)?.cant||0;
-if(stockReal <= enCarrito){alert(`Sin stock. Solo quedan ${stockReal} en ${tiendaActual.toUpperCase()}`); return;}
+if(stockReal <= enCarrito){alert(`Sin stock. Solo quedan ${stockReal}`); return;}
 let ex=carrito.find(c=>c.id===id);
 if(ex){ ex.cant++; } else { carrito.unshift({id:p.id, nombre:p.nombre, stockReal:stockReal, desc:p.desc||0, precio:p.precio[tiendaActual].v, cant:1, codigo:p.codigo}); }
 renderCaja();
@@ -236,10 +267,10 @@ return `<tr>
 <td><div class="qty-box"><button class="qty-btn" onclick="cambiarCant(${i},-1)">-</button><span style="width:28px;text-align:center;font-weight:800;cursor:pointer" onclick="abrirCant(${i})">${c.cant}</span><button class="qty-btn" onclick="cambiarCant(${i},1)">+</button></div></td>
 <td><b>${c.nombre}</b><br><small style="color:#64748b">${c.codigo}</small></td>
 <td style="text-align:center"><span style="background:var(--gray);padding:4px 8px;border-radius:6px;font-weight:700">${existencia}</span></td>
-<td style="text-align:center"><span style="color:${c.desc>0? 'var(--green)':'#64748b'}">$${(c.desc||0).toFixed(2)}</span></td>
-<td style="text-align:right;font-weight:600">$${c.precio.toFixed(2)}</td>
+<td style="text-align:center">$${(c.desc||0).toFixed(2)}</td>
+<td style="text-align:right">$${c.precio.toFixed(2)}</td>
 <td style="text-align:right;font-weight:800;background:#f8fafc">$${pFinal.toFixed(2)}</td>
-<td style="text-align:center"><button class="btn-icon" style="width:28px;height:28px;border-color:#fecaca" onclick="eliminarItem(${i})"><i data-lucide="x" style="width:12px;color:var(--red)"></i></button></td>
+<td style="text-align:center"><button class="btn-icon" style="width:28px;height:28px" onclick="eliminarItem(${i})"><i data-lucide="x" style="width:12px;color:var(--red)"></i></button></td>
 </tr>`;
 }).join('');
 document.getElementById('totalValor').innerText='$'+total.toFixed(2);
@@ -253,12 +284,24 @@ function abrirCant(i){editIndex=i; document.getElementById('cantNombre').innerTe
 function cerrarCant(){document.getElementById('modalCantidad').style.display='none'; editIndex=null;}
 function cambiarCantModal(d){let inp=document.getElementById('inputCantModal'); let v=parseInt(inp.value)||1; v+=d; if(v<1)v=1; inp.value=v;}
 function guardarCantModal(){if(editIndex===null) return; let nueva=parseInt(document.getElementById('inputCantModal').value)||1; let c=carrito[editIndex]; let p=productos.find(x=>x.id===c.id); if(nueva>p.stock[tiendaActual]){alert('Solo hay '+p.stock[tiendaActual]); return;} c.cant=nueva; cerrarCant(); renderCaja();}
-function abrirCobro(){if(carrito.length===0){alert('Carrito vacío');return;} let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); document.getElementById('cobroTotal').innerText='$'+total.toFixed(2); document.getElementById('inputRecibido').value=total.toFixed(2); document.getElementById('cobroCambio').innerText='$0.00'; document.getElementById('modalCobro').style.display='flex'; setTimeout(()=>document.getElementById('inputRecibido').select(),100); calcularCambio();}
-function cerrarCobro(){document.getElementById('modalCobro').style.display='none';}
-function calcularCambio(){let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); let rec=parseFloat(document.getElementById('inputRecibido').value)||0; let cambio=rec-total; document.getElementById('cobroCambio').innerText='$'+cambio.toFixed(2); document.getElementById('cobroCambio').style.color= cambio<0? 'var(--red)':'var(--green)';}
-function finalizarVenta(){let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); let rec=parseFloat(document.getElementById('inputRecibido').value)||0; if(rec < total){alert('Falta dinero');return;} carrito.forEach(c=>{let p=productos.find(x=>x.id===c.id); if(p){p.stock[tiendaActual]-=c.cant; if(p.stock[tiendaActual]<0) p.stock[tiendaActual]=0;}}); let cambio=rec-total; log('venta','Venta caja '+tiendaActual, `Total $${total.toFixed(2)} - Recibido $${rec} - Cambio $${cambio.toFixed(2)} - ${carrito.map(c=>c.cant+'x '+c.nombre).join(', ')}`); guardarTodo(); cerrarCobro(); generarTicket(total,rec,cambio); carrito=[]; renderCaja(); actualizarCorte();}
+function abrirCobro(){if(carrito.length===0){alert('Carrito vacío');return;} let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); document.getElementById('cobroTotal').innerText='$'+total.toFixed(2); document.getElementById('inputRecibido').value=total.toFixed(2); document.getElementById('cobroCambio').innerText='$0.00'; cobroEnterCount=0; document.getElementById('modalCobro').style.display='flex'; setTimeout(()=>document.getElementById('inputRecibido').select(),100); calcularCambio();}
+function cerrarCobro(){document.getElementById('modalCobro').style.display='none'; document.getElementById('inputScan').focus();}
+function calcularCambio(){let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); let rec=parseFloat(document.getElementById('inputRecibido').value)||0; let cambio=rec-total; document.getElementById('cobroCambio').innerText='$'+cambio.toFixed(2); cobroEnterCount=0;}
+function handleCobroKey(e){
+if(e.key==='Escape'){ cerrarCobro(); }
+if(e.key==='Enter'){
+cobroEnterCount++;
+if(cobroEnterCount===1){
+calcularCambio();
+} else if(cobroEnterCount>=2){
+finalizarVenta();
+}
+e.preventDefault();
+}
+}
+function finalizarVenta(){let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0); let rec=parseFloat(document.getElementById('inputRecibido').value)||0; if(rec < total){alert('Falta dinero'); cobroEnterCount=0; return;} carrito.forEach(c=>{let p=productos.find(x=>x.id===c.id); if(p){p.stock[tiendaActual]-=c.cant; if(p.stock[tiendaActual]<0) p.stock[tiendaActual]=0;}}); let cambio=rec-total; log('venta','Venta caja '+tiendaActual, `Total $${total.toFixed(2)} - Recibido $${rec} - Cambio $${cambio.toFixed(2)} - ${carrito.map(c=>c.cant+'x '+c.nombre).join(', ')}`); guardarTodo(); cerrarCobro(); generarTicket(total,rec,cambio); carrito=[]; renderCaja(); actualizarCorte();}
 function generarTicket(total,rec,cambio){let fecha=new Date().toLocaleString('es-MX'); let lineas=carrito.map(c=> `${c.cant} x ${c.nombre.substring(0,22)} @ $${c.precio.toFixed(2)} = $${((c.precio*c.cant)-(c.desc||0)).toFixed(2)}`).join('\n'); let txt=`KIGO SUPER - ${tiendaActual.toUpperCase()}\nCajera: ${sesion.nombre}\nFecha: ${fecha}\n------------------------------\n${lineas}\n------------------------------\nTOTAL: $${total.toFixed(2)}\nRECIBIDO: $${rec.toFixed(2)}\nCAMBIO: $${cambio.toFixed(2)}\n------------------------------\nGracias!`; document.getElementById('ticketContent').innerText=txt; document.getElementById('modalTicket').style.display='flex';}
-function cerrarTicket(){document.getElementById('modalTicket').style.display='none';}
+function cerrarTicket(){document.getElementById('modalTicket').style.display='none'; document.getElementById('inputScan').focus();}
 function nuevaVenta(){cerrarTicket(); document.getElementById('inputScan').focus();}
 function actualizarCorte(){let hoy=new Date().toDateString(); let ventasHoy=historial.filter(h=> h.tipo==='venta' && new Date(h.ts).toDateString()===hoy && h.tienda===tiendaActual); let total=0; ventasHoy.forEach(v=>{let m=v.detalle.match(/Total \$([\d.]+)/); if(m) total+=parseFloat(m[1]);}); document.getElementById('corteVentas').innerText=ventasHoy.length; document.getElementById('corteTotal').innerText='$'+total.toFixed(2);}
 function verCorte(){let hoy=new Date().toDateString(); let ventasHoy=historial.filter(h=> h.tipo==='venta' && new Date(h.ts).toDateString()===hoy && h.tienda===tiendaActual); let html=ventasHoy.map(h=>{let d=new Date(h.ts).toLocaleTimeString('es-MX'); return `<div class="log-item"><div><b>${d}</b> - ${h.detalle}<br><small>${h.user}</small></div></div>`;}).join('') || '<div style="padding:20px;text-align:center">Sin ventas hoy</div>'; document.getElementById('listaCorte').innerHTML=html; document.getElementById('corteTitulo').innerText=tiendaActual.toUpperCase()+' - '+new Date().toLocaleDateString('es-MX'); document.getElementById('modalCorte').style.display='flex';}
@@ -286,7 +329,20 @@ function cerrarHist(){document.getElementById('modalHist').style.display='none';
 function filtrarHist(tipo){let lista= tipo==='todos'? historial : historial.filter(h=>h.tipo===tipo); let html=lista.map(h=>{let d=new Date(h.ts).toLocaleString('es-MX'); return `<div class="log-item"><div><b>${h.accion}</b> - ${h.detalle}<br><small style="color:#64748b">${h.user} - ${d}</small></div></div>`;}).join('') || '<div style="padding:20px;text-align:center">Sin movimientos</div>'; document.getElementById('listaHist').innerHTML=html; lucide.createIcons();}
 function limpiarHist(){if(confirm('¿Limpiar historial?')){historial=[]; guardarTodo(); abrirHistorial();}}
 function alertaWhatsApp(){let bajos=productos.filter(p=> getStockTienda(p)<=p.min); if(bajos.length===0){alert('No hay stock bajo');return;} let msg=`*ALERTA KIGO ${tiendaActual.toUpperCase()}*%0A`; bajos.forEach(p=>{msg+=`• ${p.nombre}: ${getStockTienda(p)}%0A`;}); window.open(`https://wa.me/?text=${msg}`,'_blank');}
+document.addEventListener('keydown',function(e){
+if(sesion && sesion.rol==='cajero'){
+if(e.key==='Escape'){
+let cobroAbierto=document.getElementById('modalCobro').style.display==='flex';
+if(!cobroAbierto){
+e.preventDefault();
+abrirCobro();
+} else {
+cerrarCobro();
+}
+}
+}
+});
 lucide.createIcons();
 </script>
 </body>
-</html>  
+</html>
