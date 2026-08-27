@@ -422,3 +422,89 @@ let url=URL.createObjectURL(blob);
 let a=document.createElement('a'); a.href=url; a.download='ventas_'+tiendaActual+'.csv'; a.click();
 }
 </script>
+<script>
+function finalizarVenta(){
+let total=carrito.reduce((a,c)=>a+((c.precio*c.cant)-(c.desc||0)),0);
+let rec=parseFloat(document.getElementById('inputRecibido').value)||0;
+if(rec < total){alert('Falta dinero'); cobroEnterCount=0; return;}
+carrito.forEach(c=>{let p=productos.find(x=>x.id===c.id); if(p){p.stock[tiendaActual]-=c.cant; if(p.stock[tiendaActual]<0) p.stock[tiendaActual]=0;}});
+let cambio=rec-total;
+let folio='FOL-'+Date.now().toString().slice(-6);
+let serie='A-'+tiendaActual.toUpperCase().charAt(0);
+log('venta','Venta caja '+tiendaActual, `Total $${total.toFixed(2)} - Recibido $${rec} - Cambio $${cambio.toFixed(2)} - ${carrito.map(c=>c.cant+'x '+c.nombre).join(', ')}`, {folio:folio, serie:serie, productos:[...carrito], valorTotal:total, descuento:carrito.reduce((a,c)=>a+(c.desc||0),0)});
+guardarTodo();
+cerrarCobro();
+generarTicket(total,rec,cambio,folio,serie);
+carrito=[]; selectedIndex=null; renderCaja(); actualizarCorte();
+if(configPrint.auto){
+document.getElementById('modalTicket').style.display='flex';
+document.getElementById('ticketMsg').innerText='Imprimiendo en '+configPrint.nombre+'...';
+setTimeout(()=>{ imprimirDirecto('ticketContent'); },300);
+}else{
+document.getElementById('modalTicket').style.display='flex';
+document.getElementById('ticketMsg').innerText='Ticket listo';
+}
+}
+function generarTicket(total,rec,cambio,folio,serie){
+let fecha=new Date().toLocaleString('es-MX');
+let lineas=carrito.map(c=> `${c.cant} x ${c.nombre.substring(0,22)} @ $${c.precio.toFixed(2)} = $${((c.precio*c.cant)-(c.desc||0)).toFixed(2)}`).join('\n');
+let header='';
+if(configPrint.logo && configPrint.formato!=='compacto') header='*** KIGO SUPER ***\n';
+if(configPrint.formato==='detallado' || configPrint.formato==='fiscal'){
+header+=`FOLIO: ${folio}\nSERIE: ${serie}\nCAJERO: ${sesion.nombre}\n`;
+}
+let txt=`${header}FECHA: ${fecha}\nTIENDA: ${tiendaActual.toUpperCase()}\n------------------------------\n${lineas}\n------------------------------\nTOTAL: $${total.toFixed(2)} MXN\nRECIBIDO: $${rec.toFixed(2)} MXN\nCAMBIO: $${cambio.toFixed(2)} MXN\n------------------------------\n${configPrint.pie}`;
+document.getElementById('ticketContent').innerText=txt;
+}
+function cerrarTicket(){document.getElementById('modalTicket').style.display='none'; document.getElementById('inputScan').focus();}
+function nuevaVenta(){cerrarTicket(); document.getElementById('inputScan').focus();}
+function actualizarCorte(){let hoy=new Date().toDateString(); let ventasHoy=historial.filter(h=> h.tipo==='venta' && new Date(h.ts).toDateString()===hoy && h.tienda===tiendaActual); let total=0; let desc=0; ventasHoy.forEach(v=>{ total+=v.valorTotal||0; desc+=v.descuento||0; }); document.getElementById('corteVentas').innerText=ventasHoy.length; document.getElementById('corteTotal').innerText='$'+total.toFixed(2); corteActual={ts:Date.now(), folioCorte:'CORTE-'+Date.now().toString().slice(-6), cajero:sesion?sesion.nombre:'Cajero', tienda:tiendaActual, numVentas:ventasHoy.length, descuentos:desc, total:total, detalleVentas:ventasHoy.map(h=>`${new Date(h.ts).toLocaleTimeString('es-MX')} ${h.folio||''} $${(h.valorTotal||0).toFixed(2)} Desc $${(h.descuento||0).toFixed(2)}`).join('\n'), ventas:ventasHoy, validado:false};}
+function verCorte(){
+let hoy=new Date().toDateString();
+let ventasHoy=historial.filter(h=> h.tipo==='venta' && new Date(h.ts).toDateString()===hoy && h.tienda===tiendaActual);
+let total=0; let desc=0;
+ventasHoy.forEach(v=>{ total+=v.valorTotal||0; desc+=v.descuento||0; });
+let html=ventasHoy.map(h=>{let d=new Date(h.ts).toLocaleTimeString('es-MX'); return `<div class="log-item"><div><b>${d}</b> - ${h.folio||''} - $${(h.valorTotal||0).toFixed(2)} - Desc $${(h.descuento||0).toFixed(2)}<br><small>${h.detalle.substring(0,100)}</small><br><small>${h.user}</small></div></div>`;}).join('') || '<div style="padding:20px;text-align:center">Sin ventas hoy</div>';
+let resumen=`<div style="background:#0a0a0a;color:#fff;padding:12px;display:flex;justify-content:space-between"><div><b style="color:#fff">CORTE DEL DIA - ${tiendaActual.toUpperCase()}</b><br><small style="color:#fff">${new Date().toLocaleString('es-MX')}</small><br><small style="color:#38bdf8">Cajero: ${sesion?sesion.nombre:''}</small></div><div style="text-align:right"><small style="color:#fff">VENTAS: ${ventasHoy.length}</small><br><small style="color:#fff">DESC: $${desc.toFixed(2)}</small><br><b style="color:#38bdf8;font-size:18px">TOTAL: $${total.toFixed(2)}</b></div></div>`;
+document.getElementById('listaCorte').innerHTML=resumen+html;
+document.getElementById('corteTitulo').innerText=tiendaActual.toUpperCase()+' - '+new Date().toLocaleDateString('es-MX');
+document.getElementById('modalCorte').style.display='flex';
+actualizarCorte();
+lucide.createIcons();
+}
+function ejecutarCorteYRegistrar(){
+if(!corteActual || corteActual.numVentas===0){ alert('No hay ventas para corte'); return; }
+cortesHistorial.unshift({...corteActual, ts:Date.now()});
+guardarTodo();
+generarTicketCorte(corteActual);
+imprimirDirecto('ticketCorteContent');
+setTimeout(()=>{ document.getElementById('modalCorte').style.display='none'; alert('Corte registrado para admin: '+corteActual.folioCorte+' - Total $'+corteActual.total.toFixed(2)+' - Descuentos $'+corteActual.descuentos.toFixed(2)); },800);
+}
+function llenarSelects(){let html=productos.map(p=>`<option value="${p.id}">${p.nombre}</option>`).join(''); ['tProd','cProd','coProd','mProd'].forEach(id=>{let el=document.getElementById(id); if(el) el.innerHTML=html;});}
+function abrirModal(){if(sesion.rol!=='admin') return; document.getElementById('fId').value=''; document.getElementById('fNombre').value=''; document.getElementById('fCodigo').value=''; document.getElementById('modal').style.display='flex'; lucide.createIcons();}
+function cerrarModal(){document.getElementById('modal').style.display='none';}
+function guardarProducto(){let id=document.getElementById('fId').value; let data={nombre:document.getElementById('fNombre').value,codigo:document.getElementById('fCodigo').value,cat:document.getElementById('fCat').value,peso:parseInt(document.getElementById('fPeso').value)||0,cad:document.getElementById('fCad').value,stock:{estacion:parseInt(document.getElementById('fEstS').value)||0,turbina:parseInt(document.getElementById('fTurS').value)||0,santafe:parseInt(document.getElementById('fSfeS').value)||0},precio:{estacion:{c:parseFloat(document.getElementById('fEstC').value)||0,v:parseFloat(document.getElementById('fEstV').value)||0},turbina:{c:parseFloat(document.getElementById('fTurC').value)||0,v:parseFloat(document.getElementById('fTurV').value)||0},santafe:{c:parseFloat(document.getElementById('fSfeC').value)||0,v:parseFloat(document.getElementById('fSfeV').value)||0}},min:parseInt(document.getElementById('fMin').value)||5, desc:0}; if(!data.nombre||!data.codigo){alert('Falta nombre o código');return;} if(id){let idx=productos.findIndex(p=>p.id==id); productos[idx]={...productos[idx],...data}; log('producto','Editó', data.nombre);} else {productos.unshift({id:Date.now(),...data}); log('producto','Registró', data.nombre);} guardarTodo(); cerrarModal(); renderAdmin();}
+function abrirEditar(id){let p=productos.find(x=>x.id===id); document.getElementById('fId').value=p.id; document.getElementById('fNombre').value=p.nombre; document.getElementById('fCodigo').value=p.codigo; document.getElementById('fCat').value=p.cat; document.getElementById('fPeso').value=p.peso; document.getElementById('fCad').value=p.cad||''; document.getElementById('fEstC').value=p.precio.estacion.c; document.getElementById('fEstV').value=p.precio.estacion.v; document.getElementById('fEstS').value=p.stock.estacion; document.getElementById('fTurC').value=p.precio.turbina.c; document.getElementById('fTurV').value=p.precio.turbina.v; document.getElementById('fTurS').value=p.stock.turbina; document.getElementById('fSfeC').value=p.precio.santafe.c; document.getElementById('fSfeV').value=p.precio.santafe.v; document.getElementById('fSfeS').value=p.stock.santafe; document.getElementById('fMin').value=p.min; document.getElementById('modal').style.display='flex';}
+function eliminarDefinitivo(id){if(!confirm('¿Eliminar?')) return; let p=productos.find(x=>x.id===id); productos=productos.filter(x=>x.id!==id); log('producto','Eliminó', p? p.nombre:'ID '+id); guardarTodo(); renderAdmin();}
+function abrirTraspaso(){llenarSelects(); document.getElementById('modalTraspaso').style.display='flex'; lucide.createIcons();}
+function cerrarTraspaso(){document.getElementById('modalTraspaso').style.display='none';}
+function ejecutarTraspaso(){let id=parseInt(document.getElementById('tProd').value); let de=document.getElementById('tDe').value; let a=document.getElementById('tA').value; let cant=parseInt(document.getElementById('tCant').value)||0; if(de===a){alert('Tiendas iguales');return;} let p=productos.find(x=>x.id===id); if(p.stock[de]<cant){alert('No hay suficiente stock en '+de);return;} p.stock[de]-=cant; p.stock[a]+=cant; log('traspaso','Traspaso', `${cant} ${p.nombre} de ${de} a ${a}`); guardarTodo(); cerrarTraspaso(); renderAdmin();}
+function abrirCompra(){llenarSelects(); document.getElementById('modalCompra').style.display='flex'; lucide.createIcons();}
+function cerrarCompra(){document.getElementById('modalCompra').style.display='none';}
+function ejecutarCompra(){let id=parseInt(document.getElementById('cProd').value); let tienda=document.getElementById('cTienda').value; let cant=parseInt(document.getElementById('cCant').value)||0; let costo=parseFloat(document.getElementById('cCosto').value)||0; let folio=document.getElementById('cFolio').value; let p=productos.find(x=>x.id===id); p.stock[tienda]+=cant; if(costo>0) p.precio[tienda].c=costo; log('compra','Entrada compra', `${cant} ${p.nombre} a ${tienda} - ${folio}`); guardarTodo(); cerrarCompra(); renderAdmin();}
+function abrirMerma(){llenarSelects(); document.getElementById('modalMerma').style.display='flex'; lucide.createIcons();}
+function cerrarMerma(){document.getElementById('modalMerma').style.display='none';}
+function ejecutarMerma(){let id=parseInt(document.getElementById('mProd').value); let tienda=document.getElementById('mTienda').value; let cant=parseInt(document.getElementById('mCant').value)||0; let motivo=document.getElementById('mMotivo').value; let nota=document.getElementById('mNota').value; let p=productos.find(x=>x.id===id); if(p.stock[tienda]<cant){alert('No hay stock');return;} p.stock[tienda]-=cant; log('merma',`Merma - ${motivo}`, `${cant} ${p.nombre} en ${tienda} - ${motivo} - ${nota}`); guardarTodo(); cerrarMerma(); renderAdmin();}
+function abrirConteo(){llenarSelects(); document.getElementById('modalConteo').style.display='flex'; actualizarConteo(); lucide.createIcons();}
+function cerrarConteo(){document.getElementById('modalConteo').style.display='none';}
+function actualizarConteo(){let id=parseInt(document.getElementById('coProd').value); let tienda=document.getElementById('coTienda').value; let p=productos.find(x=>x.id===id); if(!p) return; let sistema=p.stock[tienda]||0; let real=parseInt(document.getElementById('coReal').value)||0; document.getElementById('coSistema').innerText=sistema; document.getElementById('coDiff').innerText=real-sistema;}
+function ejecutarConteo(){let id=parseInt(document.getElementById('coProd').value); let tienda=document.getElementById('coTienda').value; let real=parseInt(document.getElementById('coReal').value); if(isNaN(real)){alert('Escribe cuánto contaste');return;} let p=productos.find(x=>x.id===id); let anterior=p.stock[tienda]; p.stock[tienda]=real; log('conteo','Conteo físico', `${p.nombre} en ${tienda}: ${anterior} -> ${real}`); guardarTodo(); cerrarConteo(); renderAdmin();}
+function abrirHistorial(){document.getElementById('modalHist').style.display='flex'; filtrarHist('todos'); lucide.createIcons();}
+function cerrarHist(){document.getElementById('modalHist').style.display='none';}
+function filtrarHist(tipo){let lista= tipo==='todos'? historial : historial.filter(h=>h.tipo===tipo); let html=lista.map(h=>{let d=new Date(h.ts).toLocaleString('es-MX'); return `<div class="log-item"><div><b>${h.accion}</b> - ${h.detalle}<br><small style="color:#64748b">${h.user} - ${d}</small></div></div>`;}).join('') || '<div style="padding:20px;text-align:center">Sin movimientos</div>'; document.getElementById('listaHist').innerHTML=html;}
+function limpiarHist(){if(confirm('¿Limpiar historial?')){historial=[]; guardarTodo(); abrirHistorial();}}
+function alertaWhatsApp(){let bajos=productos.filter(p=> getStockTienda(p)<=p.min); if(bajos.length===0){alert('No hay stock bajo');return;} let msg=`*ALERTA KIGO ${tiendaActual.toUpperCase()}*%0A`; bajos.forEach(p=>{msg+=`• ${p.nombre}: ${getStockTienda(p)}%0A`;}); window.open(`https://wa.me/?text=${msg}`,'_blank');}
+lucide.createIcons();
+</script>
+</body>
+</html>
